@@ -18,8 +18,8 @@ return new class extends Migration
 
         $table->unsignedInteger('slot_number');
 
-        $table->time('start_time');
-        $table->time('end_time');
+        $table->string('start_time',5);
+        $table->string('end_time',5);
 
         $table->unsignedInteger('is_break')->default(0);
 

@@ -10,26 +10,35 @@ class UserSeeder extends Seeder
 {
     public function run(): void
     {
+        $password = Hash::make('password123');
+
         $users = [
             [
+                'name' => 'System Administrator',
+                'email' => 'admin@intellisched.edu',
+                'password' => $password,
+                'role' => 'admin',
+                'is_active' => 1,
+            ],
+            [
+                'name' => 'Academic Coordinator',
+                'email' => 'coord@intellisched.edu',
+                'password' => $password,
+                'role' => 'coordinator',
+                'is_active' => 1,
+            ],
+            [
                 'name' => 'Dr. Ahmed Rahman',
-                'email' => 'ahmed.rahman@example.com',
-                'password' => Hash::make('password123'),
-                'role' => 'TEACHER',
+                'email' => 'teacher@intellisched.edu',
+                'password' => $password,
+                'role' => 'teacher',
                 'is_active' => 1,
             ],
             [
-                'name' => 'Dr. Farhana Islam',
-                'email' => 'farhana.islam@example.com',
-                'password' => Hash::make('password123'),
-                'role' => 'TEACHER',
-                'is_active' => 1,
-            ],
-            [
-                'name' => 'Mr. Tanvir Hasan',
-                'email' => 'tanvir.hasan@example.com',
-                'password' => Hash::make('password123'),
-                'role' => 'TEACHER',
+                'name' => 'Sabbir Ahmed (CR)',
+                'email' => 'student@intellisched.edu',
+                'password' => $password,
+                'role' => 'student',
                 'is_active' => 1,
             ],
         ];

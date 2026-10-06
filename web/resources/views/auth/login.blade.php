@@ -4,461 +4,555 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login | IntelliSched</title>
-    <meta name="description" content="IntelliSched — Intelligent Academic Scheduling & Timetable Optimization Platform">
+    <meta name="description" content="IntelliSched — Intelligent Academic Scheduling System Login">
+
+    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+
     <style>
         :root {
-            --bg-dark: #090d16;
-            --card-bg: rgba(15, 23, 42, 0.75);
-            --card-border: rgba(99, 102, 241, 0.2);
-            --primary: #6366f1;
-            --primary-hover: #4f46e5;
-            --primary-glow: rgba(99, 102, 241, 0.4);
-            --accent: #8b5cf6;
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
-            --input-bg: rgba(30, 41, 59, 0.6);
-            --input-border: rgba(148, 163, 184, 0.2);
-            --input-focus: #6366f1;
-            --error-bg: rgba(239, 68, 68, 0.15);
-            --error-text: #fca5a5;
-            --error-border: rgba(239, 68, 68, 0.3);
+            --bg-dark:       #080c18;
+            --card-bg:       rgba(18, 24, 48, 0.55);
+            --card-border:   rgba(139, 92, 246, 0.18);
+            --text-primary:  #f1f5f9;
+            --text-muted:    #94a3b8;
+            --indigo:        #6366f1;
+            --violet:        #8b5cf6;
+            --purple:        #a855f7;
+            --grad-main:     linear-gradient(135deg, #6366f1, #8b5cf6, #a855f7);
+            --grad-glow:     linear-gradient(135deg, rgba(99,102,241,0.18), rgba(168,85,247,0.12));
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Outfit', sans-serif;
-        }
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
-            background-color: var(--bg-dark);
-            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
             min-height: 100vh;
+            background: var(--bg-dark);
             display: flex;
-            align-items: center;
             justify-content: center;
+            align-items: center;
+            overflow: hidden;
             position: relative;
-            overflow-x: hidden;
+            padding: 20px;
         }
 
-        /* Animated background elements */
-        .bg-orb {
-            position: absolute;
-            border-radius: 50%;
-            filter: blur(90px);
-            opacity: 0.4;
-            z-index: 0;
-            animation: float 12s infinite alternate ease-in-out;
-        }
-
-        .orb-1 {
-            width: 420px;
-            height: 420px;
-            background: linear-gradient(135deg, #4f46e5, #8b5cf6);
-            top: -10%;
-            left: -10%;
-        }
-
-        .orb-2 {
-            width: 380px;
-            height: 380px;
-            background: linear-gradient(135deg, #3b82f6, #06b6d4);
-            bottom: -10%;
-            right: -10%;
-            animation-delay: -6s;
-        }
-
-        .orb-3 {
-            width: 280px;
-            height: 280px;
-            background: linear-gradient(135deg, #ec4899, #8b5cf6);
-            top: 40%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            opacity: 0.25;
-            animation-duration: 16s;
-        }
-
-        @keyframes float {
-            0% { transform: translate(0, 0) scale(1); }
-            100% { transform: translate(30px, 40px) scale(1.08); }
-        }
-
-        /* Grid Pattern Overlay */
-        .bg-grid {
-            position: absolute;
+        /* ── Animated background mesh ── */
+        .bg-mesh {
+            position: fixed;
             inset: 0;
-            background-image: 
-                linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-                linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
-            background-size: 40px 40px;
+            background:
+                radial-gradient(ellipse 80% 60% at 20% 20%, rgba(99,102,241,0.14) 0%, transparent 60%),
+                radial-gradient(ellipse 70% 50% at 80% 80%, rgba(168,85,247,0.12) 0%, transparent 60%),
+                radial-gradient(ellipse 50% 40% at 60% 10%, rgba(139,92,246,0.08) 0%, transparent 50%);
+            z-index: 0;
+        }
+
+        /* ── Floating orbs ── */
+        .orb {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.45;
             z-index: 0;
             pointer-events: none;
         }
+        .orb-1 {
+            width: 500px; height: 500px;
+            background: radial-gradient(circle, #6366f1 0%, transparent 70%);
+            top: -15%; left: -10%;
+            animation: floatOrb 14s ease-in-out infinite alternate;
+        }
+        .orb-2 {
+            width: 420px; height: 420px;
+            background: radial-gradient(circle, #a855f7 0%, transparent 70%);
+            bottom: -10%; right: -8%;
+            animation: floatOrb 18s ease-in-out infinite alternate-reverse;
+        }
+        .orb-3 {
+            width: 280px; height: 280px;
+            background: radial-gradient(circle, #8b5cf6 0%, transparent 70%);
+            top: 50%; left: 60%;
+            animation: floatOrb 22s ease-in-out infinite alternate;
+        }
 
-        .login-container {
+        @keyframes floatOrb {
+            0%   { transform: translate(0px, 0px) scale(1); }
+            100% { transform: translate(50px, 35px) scale(1.08); }
+        }
+
+        /* ── Grid dots overlay ── */
+        .bg-grid {
+            position: fixed;
+            inset: 0;
+            background-image: radial-gradient(rgba(255,255,255,0.035) 1px, transparent 1px);
+            background-size: 32px 32px;
+            z-index: 0;
+        }
+
+        /* ── Card ── */
+        .login-card {
             position: relative;
             z-index: 10;
             width: 100%;
-            max-width: 440px;
-            padding: 2.5rem;
+            max-width: 460px;
             background: var(--card-bg);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
+            backdrop-filter: blur(28px);
+            -webkit-backdrop-filter: blur(28px);
             border: 1px solid var(--card-border);
-            border-radius: 24px;
-            box-shadow: 
-                0 25px 50px -12px rgba(0, 0, 0, 0.5),
-                0 0 30px rgba(99, 102, 241, 0.15);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border-radius: 28px;
+            padding: 48px 44px;
+            box-shadow:
+                0 40px 80px -20px rgba(0,0,0,0.7),
+                0 0 0 1px rgba(255,255,255,0.04) inset;
+            animation: cardIn 0.75s cubic-bezier(0.16,1,0.3,1) forwards;
         }
 
-        .brand-header {
-            text-align: center;
-            margin-bottom: 2rem;
+        @keyframes cardIn {
+            from { opacity:0; transform: translateY(36px) scale(0.96); filter: blur(8px); }
+            to   { opacity:1; transform: translateY(0)    scale(1);    filter: blur(0);  }
         }
 
-        .brand-logo {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 60px;
-            height: 60px;
-            background: linear-gradient(135deg, var(--primary), var(--accent));
-            border-radius: 16px;
-            margin-bottom: 1rem;
-            box-shadow: 0 10px 20px var(--primary-glow);
-            color: #fff;
-            font-size: 1.75rem;
+        /* ── Logo / Brand ── */
+        .logo-wrap {
+            width: 68px; height: 68px;
+            background: var(--grad-glow);
+            border: 1px solid rgba(139,92,246,0.35);
+            border-radius: 20px;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 22px;
+            font-size: 2rem;
+            color: var(--violet);
+            transition: transform 0.4s ease, box-shadow 0.4s ease;
+            position: relative;
+            overflow: hidden;
         }
+        .logo-wrap::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: var(--grad-main);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            border-radius: inherit;
+        }
+        .logo-wrap:hover { transform: scale(1.06) rotate(4deg); box-shadow: 0 0 30px rgba(139,92,246,0.35); }
+        .logo-wrap:hover::after { opacity: 0.12; }
+        .logo-wrap i { position: relative; z-index: 1; }
 
-        .brand-title {
-            font-size: 1.85rem;
-            font-weight: 700;
-            letter-spacing: -0.5px;
-            background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 100%);
+        .brand-name {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.9rem;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            background: linear-gradient(135deg, #e2e8f0 30%, #a78bfa);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
-
-        .brand-subtitle {
-            font-size: 0.9rem;
+        .brand-sub {
             color: var(--text-muted);
-            margin-top: 0.4rem;
-        }
-
-        /* Role Badges Preview */
-        .roles-bar {
-            display: flex;
-            justify-content: center;
-            gap: 0.5rem;
-            margin-bottom: 1.5rem;
-            flex-wrap: wrap;
-        }
-
-        .role-badge {
-            font-size: 0.75rem;
-            padding: 0.25rem 0.65rem;
-            border-radius: 20px;
-            background: rgba(255, 255, 255, 0.05);
-            color: var(--text-muted);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            display: flex;
-            align-items: center;
-            gap: 0.35rem;
-        }
-
-        .role-badge i {
-            font-size: 0.7rem;
-            color: var(--primary);
-        }
-
-        /* Alert Messages */
-        .alert {
-            padding: 0.85rem 1rem;
-            border-radius: 12px;
             font-size: 0.875rem;
-            margin-bottom: 1.5rem;
+            margin-top: 4px;
+        }
+
+        /* ── Role badges ── */
+        .role-badges {
             display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin: 20px 0 28px;
+        }
+        .role-badge {
+            display: inline-flex;
             align-items: center;
-            gap: 0.65rem;
-        }
-
-        .alert-danger {
-            background: var(--error-bg);
-            color: var(--error-text);
-            border: 1px solid var(--error-border);
-        }
-
-        .alert-success {
-            background: rgba(34, 197, 94, 0.15);
-            color: #86efac;
-            border: 1px solid rgba(34, 197, 94, 0.3);
-        }
-
-        /* Form Group */
-        .form-group {
-            margin-bottom: 1.25rem;
-        }
-
-        .form-label {
-            display: block;
-            font-size: 0.85rem;
+            gap: 5px;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
             font-weight: 500;
+            border: 1px solid rgba(255,255,255,0.1);
+            background: rgba(255,255,255,0.04);
             color: var(--text-muted);
-            margin-bottom: 0.5rem;
+            transition: all 0.25s ease;
+        }
+        .role-badge.admin     { border-color: rgba(239,68,68,0.3);   color: #fca5a5; }
+        .role-badge.coord     { border-color: rgba(99,102,241,0.4);  color: #a5b4fc; }
+        .role-badge.teacher   { border-color: rgba(34,197,94,0.3);   color: #86efac; }
+        .role-badge.student   { border-color: rgba(251,191,36,0.3);  color: #fde68a; }
+
+        /* ── Section label ── */
+        .section-label {
+            font-size: 0.7rem;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 18px;
         }
 
-        .input-wrapper {
+        /* ── Input groups ── */
+        .field-wrap {
             position: relative;
+            margin-bottom: 18px;
         }
-
-        .input-icon {
+        .field-icon {
             position: absolute;
-            left: 1rem;
+            left: 16px;
             top: 50%;
             transform: translateY(-50%);
-            color: var(--text-muted);
+            color: #4b5563;
+            font-size: 1.05rem;
+            transition: color 0.3s ease;
+            z-index: 5;
+            pointer-events: none;
+        }
+        .field-toggle {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #4b5563;
             font-size: 1rem;
-            transition: color 0.2s ease;
-        }
-
-        .form-input {
-            width: 100%;
-            padding: 0.85rem 1rem 0.85rem 2.8rem;
-            background: var(--input-bg);
-            border: 1px solid var(--input-border);
-            border-radius: 12px;
-            color: var(--text-main);
-            font-size: 0.95rem;
-            outline: none;
-            transition: all 0.2s ease;
-        }
-
-        .form-input:focus {
-            border-color: var(--input-focus);
-            box-shadow: 0 0 0 4px var(--primary-glow);
-            background: rgba(30, 41, 59, 0.85);
-        }
-
-        .form-input:focus + .input-icon,
-        .input-wrapper:focus-within .input-icon {
-            color: var(--primary);
-        }
-
-        .password-toggle {
-            position: absolute;
-            right: 1rem;
-            top: 50%;
-            transform: translateY(-50%);
+            z-index: 5;
+            cursor: pointer;
             background: none;
             border: none;
-            color: var(--text-muted);
-            cursor: pointer;
+            padding: 0;
+            transition: color 0.3s ease;
+        }
+        .field-toggle:hover { color: var(--violet); }
+
+        input.field-input {
+            width: 100%;
+            background: rgba(15, 20, 40, 0.6) !important;
+            border: 1px solid rgba(75,85,99,0.35);
+            color: var(--text-primary) !important;
+            border-radius: 14px;
+            padding: 14px 16px 14px 46px;
             font-size: 0.95rem;
-            padding: 0.2rem;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
+            outline: none;
         }
-
-        .password-toggle:hover {
-            color: var(--text-main);
+        input.field-input::placeholder { color: #4b5563; }
+        input.field-input:focus {
+            border-color: var(--violet);
+            background: rgba(15, 20, 40, 0.8) !important;
+            box-shadow: 0 0 0 4px rgba(139,92,246,0.15);
+            transform: translateY(-1px);
         }
+        .field-wrap:focus-within .field-icon { color: var(--violet); }
 
-        /* Form Options (Remember & Forgot) */
-        .form-options {
+        /* ── Remember & forgot ── */
+        .meta-row {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 1.75rem;
-            font-size: 0.85rem;
+            margin-bottom: 22px;
         }
-
-        .remember-me {
+        .check-label {
             display: flex;
             align-items: center;
-            gap: 0.5rem;
+            gap: 8px;
+            font-size: 0.875rem;
             color: var(--text-muted);
             cursor: pointer;
             user-select: none;
         }
-
-        .remember-me input[type="checkbox"] {
-            accent-color: var(--primary);
-            width: 16px;
-            height: 16px;
-            border-radius: 4px;
+        .check-label input[type="checkbox"] {
+            width: 16px; height: 16px;
+            accent-color: var(--violet);
             cursor: pointer;
+            border-radius: 4px;
         }
-
         .forgot-link {
-            color: var(--primary);
+            font-size: 0.875rem;
+            color: var(--violet);
             text-decoration: none;
-            font-weight: 500;
-            transition: color 0.2s ease;
+            transition: color 0.25s ease;
         }
+        .forgot-link:hover { color: var(--purple); text-decoration: underline; }
 
-        .forgot-link:hover {
-            color: var(--accent);
-            text-decoration: underline;
-        }
-
-        /* Submit Button */
-        .btn-submit {
+        /* ── Submit button ── */
+        .btn-sign-in {
             width: 100%;
-            padding: 0.95rem;
-            background: linear-gradient(135deg, var(--primary), var(--accent));
+            background: var(--grad-main);
             border: none;
-            border-radius: 12px;
-            color: #ffffff;
+            border-radius: 14px;
+            padding: 15px;
             font-size: 1rem;
             font-weight: 600;
+            font-family: 'Inter', sans-serif;
+            letter-spacing: 0.02em;
+            color: #fff;
             cursor: pointer;
-            box-shadow: 0 10px 25px var(--primary-glow);
-            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
+            box-shadow: 0 4px 24px rgba(99,102,241,0.3);
+        }
+        .btn-sign-in::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(255,255,255,0.12), transparent);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .btn-sign-in:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 32px rgba(139,92,246,0.45);
+        }
+        .btn-sign-in:hover::before { opacity: 1; }
+        .btn-sign-in:active { transform: translateY(0); }
+
+        /* Loading state */
+        .btn-sign-in.loading { pointer-events: none; opacity: 0.8; }
+        .btn-sign-in .spinner {
+            display: none;
+            width: 16px; height: 16px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+            vertical-align: middle;
+            margin-right: 8px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* ── Divider ── */
+        .divider {
             display: flex;
             align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
+            gap: 12px;
+            margin: 24px 0;
+        }
+        .divider::before, .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: rgba(255,255,255,0.07);
+        }
+        .divider span {
+            font-size: 0.75rem;
+            color: #374151;
+            letter-spacing: 0.05em;
         }
 
-        .btn-submit:hover {
-            opacity: 0.95;
-            transform: translateY(-2px);
-            box-shadow: 0 15px 30px var(--primary-glow);
-        }
-
-        .btn-submit:active {
-            transform: translateY(0);
-        }
-
-        /* Footer */
-        .login-footer {
-            margin-top: 2rem;
+        /* ── Footer ── */
+        .card-footer-text {
             text-align: center;
-            font-size: 0.8rem;
+            font-size: 0.875rem;
             color: var(--text-muted);
-            border-top: 1px solid rgba(255, 255, 255, 0.06);
-            padding-top: 1.25rem;
+            margin-top: 6px;
+        }
+        .card-footer-text a {
+            color: var(--violet);
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.25s ease;
+        }
+        .card-footer-text a:hover { color: var(--purple); }
+
+        /* ── Alert ── */
+        .alert-error {
+            background: rgba(239,68,68,0.12);
+            border: 1px solid rgba(239,68,68,0.25);
+            border-radius: 12px;
+            padding: 12px 16px;
+            color: #fca5a5;
+            font-size: 0.875rem;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: shakeX 0.4s ease;
+        }
+        .alert-success {
+            background: rgba(34,197,94,0.12);
+            border: 1px solid rgba(34,197,94,0.25);
+            border-radius: 12px;
+            padding: 12px 16px;
+            color: #86efac;
+            font-size: 0.875rem;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        @keyframes shakeX {
+            0%,100% { transform: translateX(0); }
+            20%,60% { transform: translateX(-6px); }
+            40%,80% { transform: translateX(6px); }
         }
 
-        .login-footer a {
-            color: var(--primary);
-            text-decoration: none;
+        /* ── Version badge ── */
+        .version-tag {
+            position: fixed;
+            bottom: 18px;
+            right: 20px;
+            font-size: 0.7rem;
+            color: rgba(255,255,255,0.15);
+            font-family: 'Inter', sans-serif;
+            z-index: 100;
+            letter-spacing: 0.05em;
         }
     </style>
 </head>
 <body>
 
-    <div class="bg-orb orb-1"></div>
-    <div class="bg-orb orb-2"></div>
-    <div class="bg-orb orb-3"></div>
-    <div class="bg-grid"></div>
+<!-- Background layers -->
+<div class="bg-mesh"></div>
+<div class="bg-grid"></div>
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+<div class="orb orb-3"></div>
 
-    <div class="login-container">
-        
-        <div class="brand-header">
-            <div class="brand-logo">
-                <i class="fa-solid fa-calendar-check"></i>
-            </div>
-            <h1 class="brand-title">IntelliSched</h1>
-            <p class="brand-subtitle">Academic Routine & Constraint Scheduling Platform</p>
+<!-- Login Card -->
+<div class="login-card">
+
+    <!-- Brand -->
+    <div class="text-center">
+        <div class="logo-wrap">
+            <i class="bi bi-calendar2-week"></i>
         </div>
-
-        <div class="roles-bar">
-            <span class="role-badge"><i class="fa-solid fa-user-shield"></i> Admin</span>
-            <span class="role-badge"><i class="fa-solid fa-sliders"></i> Coordinator</span>
-            <span class="role-badge"><i class="fa-solid fa-chalkboard-user"></i> Teacher</span>
-            <span class="role-badge"><i class="fa-solid fa-user-graduate"></i> Student</span>
-        </div>
-
-        @if ($errors->any())
-            <div class="alert alert-danger" role="alert">
-                <i class="fa-solid fa-circle-exclamation"></i>
-                <span>{{ $errors->first() }}</span>
-            </div>
-        @endif
-
-        @if (session('status'))
-            <div class="alert alert-success" role="alert">
-                <i class="fa-solid fa-circle-check"></i>
-                <span>{{ session('status') }}</span>
-            </div>
-        @endif
-
-        <form action="{{ route('login') }}" method="POST" id="loginForm">
-            @csrf
-
-            <div class="form-group">
-                <label for="email" class="form-label">Email Address</label>
-                <div class="input-wrapper">
-                    <input type="email" 
-                           id="email" 
-                           name="email" 
-                           class="form-input" 
-                           placeholder="name@university.edu" 
-                           value="{{ old('email') }}" 
-                           required 
-                           autofocus>
-                    <i class="fa-regular fa-envelope input-icon"></i>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label for="password" class="form-label">Password</label>
-                <div class="input-wrapper">
-                    <input type="password" 
-                           id="password" 
-                           name="password" 
-                           class="form-input" 
-                           placeholder="••••••••••••" 
-                           required>
-                    <i class="fa-solid fa-lock input-icon"></i>
-                    <button type="button" class="password-toggle" onclick="togglePassword()" id="toggleBtn" aria-label="Toggle Password Visibility">
-                        <i class="fa-regular fa-eye" id="eyeIcon"></i>
-                    </button>
-                </div>
-            </div>
-
-            <div class="form-options">
-                <label class="remember-me">
-                    <input type="checkbox" name="remember" id="remember" {{ old('remember') ? 'checked' : '' }}>
-                    <span>Remember me</span>
-                </label>
-                <a href="#" class="forgot-link" onclick="alert('Please contact your System Administrator to reset your password.'); return false;">Forgot password?</a>
-            </div>
-
-            <button type="submit" class="btn-submit" id="submitBtn">
-                <span>Sign In to Dashboard</span>
-                <i class="fa-solid fa-arrow-right"></i>
-            </button>
-        </form>
-
-        <div class="login-footer">
-            <p>IntelliSched &copy; {{ date('Y') }} — Powered by CP-SAT Constraint Engine</p>
-        </div>
-
+        <div class="brand-name">IntelliSched</div>
+        <div class="brand-sub">Intelligent Academic Scheduling System</div>
     </div>
 
-    <script>
-        function togglePassword() {
-            const passwordInput = document.getElementById('password');
-            const eyeIcon = document.getElementById('eyeIcon');
-            
-            if (passwordInput.type === 'password') {
-                passwordInput.type = 'text';
-                eyeIcon.classList.remove('fa-eye');
-                eyeIcon.classList.add('fa-eye-slash');
-            } else {
-                passwordInput.type = 'password';
-                eyeIcon.classList.remove('fa-eye-slash');
-                eyeIcon.classList.add('fa-eye');
-            }
+    <!-- Role Badges -->
+    <div class="role-badges">
+        <span class="role-badge admin"><i class="bi bi-shield-fill"></i> Admin</span>
+        <span class="role-badge coord"><i class="bi bi-person-badge"></i> Coordinator</span>
+        <span class="role-badge teacher"><i class="bi bi-mortarboard"></i> Teacher</span>
+        <span class="role-badge student"><i class="bi bi-person-fill"></i> Student</span>
+    </div>
+
+    <!-- Alerts -->
+    @if($errors->has('email'))
+        <div class="alert-error">
+            <i class="bi bi-exclamation-circle-fill"></i>
+            {{ $errors->first('email') }}
+        </div>
+    @endif
+
+    @if(session('success'))
+        <div class="alert-success">
+            <i class="bi bi-check-circle-fill"></i>
+            {{ session('success') }}
+        </div>
+    @endif
+
+    <!-- Section label -->
+    <div class="section-label">Sign in to your account</div>
+
+    <!-- Form -->
+    <form id="loginForm" method="POST" action="{{ route('login.post') }}" autocomplete="off">
+        @csrf
+
+        <!-- Email -->
+        <div class="field-wrap">
+            <i class="bi bi-envelope field-icon"></i>
+            <input
+                id="email"
+                type="email"
+                name="email"
+                class="field-input"
+                placeholder="Email address"
+                value="{{ old('email', Cookie::get('saved_email', '')) }}"
+                required
+                autofocus
+            >
+        </div>
+
+        <!-- Password -->
+        <div class="field-wrap">
+            <i class="bi bi-lock field-icon"></i>
+            <input
+                id="password"
+                type="password"
+                name="password"
+                class="field-input"
+                placeholder="Password"
+                required
+                style="padding-right: 46px;"
+            >
+            <button type="button" class="field-toggle" id="togglePassword" title="Show/Hide password">
+                <i class="bi bi-eye" id="toggleIcon"></i>
+            </button>
+        </div>
+
+        <!-- Remember / Forgot -->
+        <div class="meta-row">
+            <label class="check-label">
+                <input type="checkbox" name="remember_email" id="rememberEmail" {{ Cookie::has('saved_email') ? 'checked' : '' }}>
+                Remember my email
+            </label>
+            <a href="#" class="forgot-link">Forgot password?</a>
+        </div>
+
+        <!-- Submit -->
+        <button type="submit" class="btn-sign-in" id="signInBtn">
+            <span class="spinner" id="spinner"></span>
+            <span id="btnText">Sign In</span>
+            <i class="bi bi-arrow-right-short ms-1" id="btnIcon"></i>
+        </button>
+
+    </form>
+
+</div>
+
+<!-- Version -->
+<div class="version-tag">IntelliSched v1.0 · ariful51</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Password toggle
+    document.getElementById('togglePassword').addEventListener('click', function () {
+        const pwd = document.getElementById('password');
+        const icon = document.getElementById('toggleIcon');
+        if (pwd.type === 'password') {
+            pwd.type = 'text';
+            icon.className = 'bi bi-eye-slash';
+        } else {
+            pwd.type = 'password';
+            icon.className = 'bi bi-eye';
         }
-    </script>
+    });
+
+    // Loading state on submit
+    document.getElementById('loginForm').addEventListener('submit', function () {
+        const btn = document.getElementById('signInBtn');
+        const spinner = document.getElementById('spinner');
+        const icon = document.getElementById('btnIcon');
+        const text = document.getElementById('btnText');
+        btn.classList.add('loading');
+        spinner.style.display = 'inline-block';
+        icon.style.display = 'none';
+        text.textContent = 'Signing in...';
+    });
+
+    // Role badge highlight on email focus (subtle UX)
+    document.getElementById('email').addEventListener('focus', function() {
+        document.querySelectorAll('.role-badge').forEach(b => {
+            b.style.opacity = '0.6';
+        });
+    });
+    document.getElementById('email').addEventListener('blur', function() {
+        document.querySelectorAll('.role-badge').forEach(b => {
+            b.style.opacity = '1';
+        });
+    });
+</script>
+
 </body>
 </html>

@@ -1,6 +1,8 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\TeacherCourseScoreController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\CourseController;
@@ -14,11 +16,12 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\AuditLogController;
 use App\Http\Controllers\TimeSlotController;
 
-/*
-|--------------------------------------------------------------------------
-| Web Routes — IntelliSched Academic System
-|--------------------------------------------------------------------------
-*/
+
+Route::get(
+    '/teacher-course-scores',
+    [TeacherCourseScoreController::class, 'index']
+);
+
 
 // Root redirect to login
 Route::get('/', function () {

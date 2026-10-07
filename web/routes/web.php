@@ -15,7 +15,7 @@ use App\Http\Controllers\ExamController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\AuditLogController;
 use App\Http\Controllers\TimeSlotController;
-
+use App\Http\Controllers\CRCommunicationController;
 
 use App\Http\Controllers\SchedulerInputController;
 
@@ -67,6 +67,8 @@ Route::middleware('auth')->group(function () {
     Route::resource('courses', CourseController::class);
 
     // Teachers Management & Preferences & Availability
+    Route::get('/teacher/cr-communication', [CRCommunicationController::class, 'index'])->name('teacher.cr-communication');
+    Route::post('/teacher/cr-communication/send', [CRCommunicationController::class, 'sendMessage'])->name('teacher.cr-communication.send');
     Route::match(['get', 'post'], '/teachers/preferences', [TeacherController::class, 'preferences'])->name('teachers.preferences');
     Route::match(['get', 'post'], '/teachers/{teacher}/availability', [TeacherController::class, 'availability'])->name('teachers.availability');
     Route::resource('teachers', TeacherController::class);

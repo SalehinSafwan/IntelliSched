@@ -70,6 +70,12 @@
 
             <div class="nav-section-title">Intelligence & Optimization</div>
 
+            <!-- CR & ACR Network -->
+            <a href="{{ route('teacher.cr-communication') }}" class="{{ request()->routeIs('teacher.cr-communication*') ? 'active' : '' }}">
+                <i class="bi bi-people-fill text-indigo"></i>
+                <span>CR & ACR Network</span>
+            </a>
+
             <!-- Teacher Preferences -->
             <a href="{{ route('teachers.preferences') }}" class="{{ request()->routeIs('teachers.preferences*') ? 'active' : '' }}">
                 <i class="bi bi-sliders"></i>
@@ -101,6 +107,11 @@
 
         @if($role === 'TEACHER')
             <div class="nav-section-title">Teacher Portal</div>
+
+            <a href="{{ route('teacher.cr-communication') }}" class="{{ request()->routeIs('teacher.cr-communication*') ? 'active' : '' }}">
+                <i class="bi bi-megaphone-fill text-indigo"></i>
+                <span>CR & ACR Communication</span>
+            </a>
 
             <a href="{{ route('teachers.show', ['teacher' => 1]) }}" class="{{ request()->routeIs('teachers.show') ? 'active' : '' }}">
                 <i class="bi bi-book-half"></i>

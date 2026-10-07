@@ -35,4 +35,8 @@ return [
         ],
     ],
 
+    'scheduler' => [
+    'url' => env('SCHEDULER_URL'),
+    ],
+
 ];

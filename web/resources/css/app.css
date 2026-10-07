@@ -13,12 +13,12 @@
     --bg-sidebar:       #0e1526;
     --bg-navbar:        rgba(14, 21, 38, 0.85);
     
-    --border-color:     rgba(255, 255, 255, 0.08);
+    --border-color:     rgba(255, 255, 255, 0.12);
     --border-accent:    rgba(139, 92, 246, 0.3);
     
-    --text-main:        #f1f5f9;
-    --text-muted:       #94a3b8;
-    --text-dim:         #64748b;
+    --text-main:        #ffffff;
+    --text-muted:       #f8fafc;
+    --text-dim:         #e2e8f0;
     
     --primary:          #6366f1; /* Indigo */
     --primary-hover:    #4f46e5;
@@ -668,3 +668,47 @@ h1, h2, h3, h4, h5, h6, .brand-font {
 .wizard-step-item.active .step-label {
     color: var(--text-main);
 }
+
+/* ── High Contrast White Mini & Muted Text Overrides ── */
+.text-muted,
+.text-secondary,
+.text-dim,
+small,
+.small,
+.form-text,
+.stat-lbl,
+.nav-section-title,
+.form-label-custom,
+.table-custom th,
+.table th,
+.card-subtitle,
+.sub-title,
+.breadcrumb-item,
+.help-block,
+.meta-text,
+.field-icon,
+.field-toggle,
+label:not(.btn) {
+    color: #f8fafc !important;
+}
+
+.sidebar-nav a {
+    color: #f8fafc !important;
+}
+
+.sidebar-nav a i {
+    color: #e2e8f0 !important;
+}
+
+.sidebar-logo span {
+    color: #f8fafc !important;
+}
+
+input::placeholder,
+select::placeholder,
+textarea::placeholder,
+.form-control::placeholder {
+    color: #cbd5e1 !important;
+    opacity: 1 !important;
+}
+

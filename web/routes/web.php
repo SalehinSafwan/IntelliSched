@@ -17,6 +17,13 @@ use App\Http\Controllers\AuditLogController;
 use App\Http\Controllers\TimeSlotController;
 
 
+use App\Http\Controllers\SchedulerInputController;
+
+Route::get(
+    '/scheduler-input',
+    [SchedulerInputController::class, 'show']
+);
+
 Route::get(
     '/teacher-course-scores',
     [TeacherCourseScoreController::class, 'index']

@@ -1,0 +1,31 @@
+{
+  "version": 2,
+  "dgSpecHash": "1nzpCN9rUt0=",
+  "success": true,
+  "projectFilePath": "G:\\Semesters\\3-2\\System Project\\IntelliSched\\IntelliSched\\Scheduler\\Scheduler.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\Safwan\\.nuget\\packages\\google.ortools\\9.15.6755\\google.ortools.9.15.6755.nupkg.sha512",
+    "C:\\Users\\Safwan\\.nuget\\packages\\google.ortools.runtime.linux-arm64\\9.15.6755\\google.ortools.runtime.linux-arm64.9.15.6755.nupkg.sha512",
+    "C:\\Users\\Safwan\\.nuget\\packages\\google.ortools.runtime.linux-x64\\9.15.6755\\google.ortools.runtime.linux-x64.9.15.6755.nupkg.sha512",
+    "C:\\Users\\Safwan\\.nuget\\packages\\google.ortools.runtime.osx-arm64\\9.15.6755\\google.ortools.runtime.osx-arm64.9.15.6755.nupkg.sha512",
+    "C:\\Users\\Safwan\\.nuget\\packages\\google.ortools.runtime.osx-x64\\9.15.6755\\google.ortools.runtime.osx-x64.9.15.6755.nupkg.sha512",
+    "C:\\Users\\Safwan\\.nuget\\packages\\google.ortools.runtime.win-x64\\9.15.6755\\google.ortools.runtime.win-x64.9.15.6755.nupkg.sha512",
+    "C:\\Users\\Safwan\\.nuget\\packages\\google.protobuf\\3.33.1\\google.protobuf.3.33.1.nupkg.sha512",
+    "C:\\Users\\Safwan\\.nuget\\packages\\microsoft.aspnetcore.openapi\\10.0.7\\microsoft.aspnetcore.openapi.10.0.7.nupkg.sha512",
+    "C:\\Users\\Safwan\\.nuget\\packages\\microsoft.openapi\\2.0.0\\microsoft.openapi.2.0.0.nupkg.sha512"
+  ],
+  "logs": [
+    {
+      "code": "NU1903",
+      "level": "Warning",
+      "message": "Package 'Microsoft.OpenApi' 2.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-v5pm-xwqc-g5wc",
+      "projectPath": "G:\\Semesters\\3-2\\System Project\\IntelliSched\\IntelliSched\\Scheduler\\Scheduler.csproj",
+      "warningLevel": 1,
+      "filePath": "G:\\Semesters\\3-2\\System Project\\IntelliSched\\IntelliSched\\Scheduler\\Scheduler.csproj",
+      "libraryId": "Microsoft.OpenApi",
+      "targetGraphs": [
+        "net10.0"
+      ]
+    }
+  ]
+}

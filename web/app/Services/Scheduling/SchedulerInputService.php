@@ -2,6 +2,7 @@
 
 namespace App\Services\Scheduling;
 
+use Carbon\Carbon;
 use App\Models\AcademicTerm;
 use App\Models\Batch;
 use App\Models\CourseOffering;
@@ -67,7 +68,17 @@ class SchedulerInputService
             ->get();
 
         return [
-            'academic_term' => $academicTerm,
+                'academic_term' => [
+                'id' => $academicTerm->id,
+                'name' => $academicTerm->name,
+                'academic_year' => $academicTerm->academic_year,
+                'term' => $academicTerm->term,
+                'start_date' => Carbon::parse($academicTerm->start_date)
+                    ->format('Y-m-d\TH:i:s'),
+                'end_date' => Carbon::parse($academicTerm->end_date)
+                    ->format('Y-m-d\TH:i:s'),
+                    'status' => $academicTerm->status,
+                ],
             'batch' => $batch,
             'sections' => $batch->sections,
             'offerings' => $this->buildOfferings($offerings),

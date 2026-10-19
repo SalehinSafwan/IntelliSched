@@ -10,7 +10,7 @@ public class SchedulerInput
     public BatchInput Batch { get; set; } = new();
     [JsonPropertyName("sections")]
     public List<SectionInput> Sections { get; set; } = new();
-    [JsonPropertyName("course_offering_input")]
+    [JsonPropertyName("offerings")]
     public List<CourseOfferingInput> Offerings { get; set; } = new();
     [JsonPropertyName("teachers")]
     public List<TeacherInput> Teachers { get; set; } = new();

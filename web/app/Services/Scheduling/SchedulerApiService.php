@@ -13,8 +13,16 @@ class SchedulerApiService
         $response = Http::timeout(120)
             ->post($url . '/api/scheduler/generate', $input);
 
-        $response->throw();
+        
 
+        if ($response->failed()) {
+    dd([
+        'status' => $response->status(),
+        'response' => $response->json(),
+        'sent_input' => $input,
+    ]);
+}
+        $response->throw();
         return $response->json();
     }
 }

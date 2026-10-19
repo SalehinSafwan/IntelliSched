@@ -19,6 +19,23 @@ use App\Http\Controllers\TimeSlotController;
 
 use App\Http\Controllers\SchedulerInputController;
 
+use App\Services\Scheduling\SchedulerApiService;
+use App\Services\Scheduling\SchedulerInputService;
+
+
+Route::get('/test-scheduler-connection', function (
+    SchedulerInputService $inputService,
+    SchedulerApiService $schedulerApiService
+) {
+    // Replace these with IDs that exist in your Oracle database.
+    $batchId = 1;
+    $academicTermId = 1;
+
+    $input = $inputService->build($batchId, $academicTermId);
+
+    return $schedulerApiService->generate($input);
+});
+
 Route::get(
     '/scheduler-input',
     [SchedulerInputController::class, 'show']

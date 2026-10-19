@@ -58,7 +58,7 @@ class TimeSlotSeeder extends Seeder
                 'slot_number' => 6,
                 'start_time' => '11:30',
                 'end_time' => '12:20',
-                'is_break' => 1,
+                'is_break' => 0,
             ],
 
             [

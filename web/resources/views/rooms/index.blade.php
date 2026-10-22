@@ -1,109 +1,104 @@
 @extends('layouts.app')
 
-@section('title', 'Room Management')
+@section('title', 'Rooms')
 
 @section('content')
 
-<!-- Header Bar -->
-<div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3 mb-4">
-    <div>
-        <h2 class="brand-font fw-bold text-white mb-1">Classrooms & Laboratories</h2>
-        <p class="text-muted mb-0" style="font-size: 0.88rem;">Manage room capacities, lab course eligibility, priority levels, and building locations.</p>
+@php
+    $icons = ['THEORY' => 'bi-easel2', 'LAB' => 'bi-pc-display', 'MULTIPURPOSE' => 'bi-grid-1x2'];
+@endphp
+
+<x-page-header eyebrow="Infrastructure" title="Rooms & Labs"
+               subtitle="Rooms with a lower priority number are preferred by the routine generator.">
+    <x-export-pdf-button :href="route('export.rooms')" />
+    <a href="{{ route('rooms.create') }}" class="btn-indigo"><i class="bi bi-plus-lg"></i> New Room</a>
+</x-page-header>
+
+<div class="row g-4 mb-4">
+    <div class="col-6 col-xl-3">
+        <div class="glass-card stat-card">
+            <div><div class="stat-lbl">Rooms</div><div class="stat-val text-white">{{ $stats['total'] }}</div></div>
+            <div class="stat-icon-wrapper stat-icon-primary"><i class="bi bi-building"></i></div>
+        </div>
     </div>
-    <div>
-        <a href="{{ route('rooms.create') }}" class="btn-indigo">
-            <i class="bi bi-plus-lg"></i> Add New Room
-        </a>
+    <div class="col-6 col-xl-3">
+        <div class="glass-card stat-card">
+            <div><div class="stat-lbl">Total Seats</div><div class="stat-val text-white">{{ number_format($stats['seats']) }}</div></div>
+            <div class="stat-icon-wrapper stat-icon-success"><i class="bi bi-people"></i></div>
+        </div>
+    </div>
+    <div class="col-6 col-xl-3">
+        <div class="glass-card stat-card">
+            <div><div class="stat-lbl">Labs</div><div class="stat-val text-white">{{ $stats['byType']['LAB'] ?? 0 }}</div></div>
+            <div class="stat-icon-wrapper stat-icon-accent"><i class="bi bi-pc-display"></i></div>
+        </div>
+    </div>
+    <div class="col-6 col-xl-3">
+        <div class="glass-card stat-card">
+            <div><div class="stat-lbl">Multipurpose</div><div class="stat-val text-white">{{ $stats['byType']['MULTIPURPOSE'] ?? 0 }}</div></div>
+            <div class="stat-icon-wrapper stat-icon-warning"><i class="bi bi-grid-1x2"></i></div>
+        </div>
     </div>
 </div>
 
-<!-- Search & Filters -->
-<div class="glass-card mb-4 p-3">
-    <div class="row g-3">
-        <div class="col-12 col-md-6">
-            <div style="position: relative;">
-                <i class="bi bi-search" style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--text-dim);"></i>
-                <input type="text" class="form-control form-control-custom" placeholder="Search by room number, building, or type..." style="padding-left: 40px !important;">
+<div class="filter-pills mb-4">
+    <a href="{{ route('rooms.index') }}" class="{{ !$type ? 'active' : '' }}">All</a>
+    @foreach(config('intellisched.room_types') as $value => $label)
+        <a href="{{ route('rooms.index', ['type' => $value]) }}" class="{{ $type === $value ? 'active' : '' }}">{{ $label }}</a>
+    @endforeach
+</div>
+
+<div class="row g-4 mb-4">
+    @forelse($rooms as $room)
+        <div class="col-12 col-md-6 col-xxl-4">
+            <div class="glass-card card-hoverable room-card h-100 d-flex flex-column">
+                <div class="d-flex align-items-start justify-content-between gap-3 mb-3">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="room-type-icon room-type-{{ $room->room_type }}"><i class="bi {{ $icons[$room->room_type] ?? 'bi-door-open' }}"></i></div>
+                        <div>
+                            <a href="{{ route('rooms.show', $room) }}" class="brand-font fw-bold text-white fs-5 text-decoration-none">{{ $room->room_code }}</a>
+                            <div class="text-muted" style="font-size: 0.82rem;">{{ $room->room_name }}</div>
+                        </div>
+                    </div>
+                    <x-status-badge :status="$room->status" />
+                </div>
+
+                <div class="room-meta mb-3">
+                    <span><i class="bi bi-people me-1"></i><strong>{{ $room->capacity }}</strong> seats</span>
+                    <span><i class="bi bi-sort-numeric-down me-1"></i>Priority <strong>{{ $room->priority }}</strong></span>
+                    @if($room->building)
+                        <span><i class="bi bi-geo-alt me-1"></i>{{ $room->building }}{{ $room->floor ? ' · Floor ' . $room->floor : '' }}</span>
+                    @endif
+                </div>
+
+                <div class="mb-3" style="min-height: 28px;">
+                    @if($room->room_type === 'THEORY')
+                        <span class="text-dim" style="font-size: 0.78rem;">Theory classes</span>
+                    @else
+                        @forelse($room->eligibleCourses as $course)
+                            <span class="badge-custom badge-lab me-1 mb-1">{{ $course->course_code }}</span>
+                        @empty
+                            <span class="text-dim" style="font-size: 0.78rem;"><i class="bi bi-exclamation-circle me-1"></i>No lab courses assigned</span>
+                        @endforelse
+                    @endif
+                </div>
+
+                <div class="d-flex gap-2 mt-auto">
+                    <a href="{{ route('rooms.show', $room) }}" class="btn-glass btn-sm-custom"><i class="bi bi-eye"></i> View</a>
+                    <a href="{{ route('rooms.edit', $room) }}" class="btn-glass btn-sm-custom"><i class="bi bi-pencil"></i> Edit</a>
+                    <x-delete-button :action="route('rooms.destroy', $room)" :confirm="'Delete room ' . $room->room_code . '?'" />
+                </div>
             </div>
         </div>
-        <div class="col-12 col-md-3">
-            <select class="form-select form-select-custom">
-                <option value="">All Room Types</option>
-                <option value="Theory">Theory Classroom</option>
-                <option value="Lab">Specialized Lab</option>
-                <option value="Lab/Theory">Lab / Theory Multi-use</option>
-            </select>
+    @empty
+        <div class="col-12">
+            <div class="glass-card text-center py-5">
+                <div class="empty-state-icon"><i class="bi bi-building-add"></i></div>
+                <h4 class="brand-font fw-bold text-white mt-4">No rooms here yet</h4>
+                <a href="{{ route('rooms.create') }}" class="btn-indigo mt-2"><i class="bi bi-plus-lg"></i> Add a room</a>
+            </div>
         </div>
-        <div class="col-12 col-md-3">
-            <select class="form-select form-select-custom">
-                <option value="">All Buildings</option>
-                <option value="Academic Building 1">Academic Bldg 1</option>
-                <option value="CSE Building">CSE Building</option>
-            </select>
-        </div>
-    </div>
-</div>
-
-<!-- Rooms Table -->
-<div class="table-custom-container mb-4">
-    <table class="table-custom">
-        <thead>
-            <tr>
-                <th>Room No</th>
-                <th>Room Name</th>
-                <th>Type</th>
-                <th>Capacity</th>
-                <th>Priority</th>
-                <th>Building / Floor</th>
-                <th>Status</th>
-                <th class="text-end">Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            @php
-                $rooms = [
-                    ['no' => '101', 'name' => 'Lecture Hall 101', 'type' => 'Theory', 'cap' => 60, 'prio' => 1, 'bldg' => 'Academic Bldg 1', 'fl' => '1st Floor', 'status' => 'ACTIVE'],
-                    ['no' => '102', 'name' => 'Lecture Hall 102', 'type' => 'Theory', 'cap' => 60, 'prio' => 2, 'bldg' => 'Academic Bldg 1', 'fl' => '1st Floor', 'status' => 'ACTIVE'],
-                    ['no' => 'LAB-01', 'name' => 'Database & Software Lab', 'type' => 'Lab', 'cap' => 30, 'prio' => 5, 'bldg' => 'CSE Building', 'fl' => '2nd Floor', 'status' => 'ACTIVE'],
-                    ['no' => 'LAB-02', 'name' => 'AI & Robotics Lab', 'type' => 'Lab', 'cap' => 30, 'prio' => 4, 'bldg' => 'CSE Building', 'fl' => '2nd Floor', 'status' => 'ACTIVE'],
-                    ['no' => 'LAB-T1', 'name' => 'Multi-purpose Lab/Theory', 'type' => 'Lab/Theory', 'cap' => 60, 'prio' => 3, 'bldg' => 'CSE Building', 'fl' => '3rd Floor', 'status' => 'ACTIVE'],
-                ];
-            @endphp
-
-            @foreach($rooms as $r)
-                <tr>
-                    <td class="fw-bold text-white brand-font">{{ $r['no'] }}</td>
-                    <td class="fw-semibold text-white">{{ $r['name'] }}</td>
-                    <td>
-                        @if($r['type'] === 'Theory')
-                            <span class="badge-custom badge-theory">Theory</span>
-                        @elseif($r['type'] === 'Lab')
-                            <span class="badge-custom badge-lab">Specialized Lab</span>
-                        @else
-                            <span class="badge bg-purple" style="background: var(--accent-purple);">Lab / Theory</span>
-                        @endif
-                    </td>
-                    <td class="fw-bold text-indigo"><i class="bi bi-people-fill me-1"></i> {{ $r['cap'] }} Seats</td>
-                    <td><span class="badge bg-dark border border-secondary">Priority #{{ $r['prio'] }}</span></td>
-                    <td class="text-muted" style="font-size: 0.85rem;">{{ $r['bldg'] }} ({{ $r['fl'] }})</td>
-                    <td><span class="badge-custom badge-active">Active</span></td>
-                    <td class="text-end">
-                        <div class="btn-group">
-                            <a href="{{ route('rooms.show', ['room' => $r['no']]) }}" class="btn btn-sm btn-glass py-1 px-2" title="Lab Eligibility & Details">
-                                <i class="bi bi-shield-check"></i>
-                            </a>
-                            <a href="{{ route('rooms.edit', ['room' => $r['no']]) }}" class="btn btn-sm btn-glass py-1 px-2" title="Edit Room">
-                                <i class="bi bi-pencil"></i>
-                            </a>
-                            <button class="btn btn-sm btn-glass text-danger py-1 px-2" title="Delete Room">
-                                <i class="bi bi-trash"></i>
-                            </button>
-                        </div>
-                    </td>
-                </tr>
-            @endforeach
-        </tbody>
-    </table>
+    @endforelse
 </div>
 
 @endsection

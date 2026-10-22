@@ -9,6 +9,16 @@ class AcademicTerm extends Model
 {
     protected $guarded = ['id'];
 
+    /**
+     * The term currently in use (status ACTIVE), newest first.
+     */
+    public static function current(): ?self
+    {
+        return static::where('status', 'ACTIVE')
+            ->orderByDesc('start_date')
+            ->first();
+    }
+
     public function courseOfferings(): HasMany
     {
         return $this->hasMany(CourseOffering::class);

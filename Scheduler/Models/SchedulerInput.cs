@@ -18,8 +18,8 @@ public class SchedulerInput
     public List<RoomInput> Rooms { get; set; } = new();
     [JsonPropertyName("time_slots")]
     public List<TimeSlotInput> TimeSlots { get; set; } = new();
-    [JsonPropertyName("exams")]
-    public List<ExamInput> Exams { get; set; } = new();
+    [JsonPropertyName("exam_room_blocks")]
+    public List<ExamRoomBlockInput> ExamRoomBlocks { get; set; } = new();
     [JsonPropertyName("existing_schedule_entries")]
     public List<ExistingScheduleEntryInput> ExistingScheduleEntries
         { get; set; } = new();

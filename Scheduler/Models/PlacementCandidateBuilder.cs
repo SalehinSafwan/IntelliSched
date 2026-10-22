@@ -18,6 +18,9 @@ public class PlacementCandidateBuilder
                 g => g.Key,
                 g => g.OrderBy(s => s.SlotNumber).ToList());
 
+        // Rooms reserved by published exams on a weekday.
+        var examBlocks = input.ExamRoomBlocks.ToLookup(b => b.RoomId);
+
         foreach (var session in sessions)
         {
             var section = input.Sections
@@ -58,6 +61,11 @@ public class PlacementCandidateBuilder
                         if (!consecutive)
                             continue;
 
+                        // No class in a room while it hosts an exam.
+                        if (block.Any(slot => examBlocks[room.Id]
+                                .Any(exam => exam.Blocks(slot))))
+                            continue;
+
                         candidates.Add(new PlacementCandidate
                         {
                             SessionKey = session.SessionKey,
@@ -79,7 +87,8 @@ public class PlacementCandidateBuilder
         return candidates;
     }
 
-    private static bool RoomCanHost(
+    // Also used by ScheduleResultValidator.
+    internal static bool RoomCanHost(
         RoomInput room,
         ClassSession session,
         int studentCount)

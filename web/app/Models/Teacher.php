@@ -10,6 +10,14 @@ class Teacher extends Model
 {
     protected $guarded = ['id'];
 
+    /**
+     * Display name from the linked user account.
+     */
+    public function getDisplayNameAttribute(): string
+    {
+        return $this->user?->name ?? $this->employee_code;
+    }
+
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);

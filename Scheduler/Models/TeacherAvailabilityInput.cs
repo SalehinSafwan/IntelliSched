@@ -9,4 +9,8 @@ public class TeacherAvailabilityInput
     public int TimeSlotId { get; set; }
     [JsonPropertyName("is_available")]
     public bool IsAvailable { get; set; }
+
+    // Soft time-of-day preference: 1 preferred, 0 neutral, -1 avoid.
+    [JsonPropertyName("preference")]
+    public int Preference { get; set; }
 }

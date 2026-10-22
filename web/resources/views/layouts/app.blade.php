@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-bs-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -17,21 +17,21 @@
     <!-- Bootstrap Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
 
-    @if(file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
-        @vite(['resources/css/app.css', 'resources/js/app.js'])
-    @else
-        <link rel="stylesheet" href="{{ asset('build/assets/app.css') }}">
-        <script src="{{ asset('build/assets/app.js') }}" defer></script>
-    @endif
+    <!-- IntelliSched design system (served from public/, no build step) -->
+    <link rel="stylesheet" href="{{ asset('css/intellisched.css') }}?v={{ filemtime(public_path('css/intellisched.css')) }}">
 
     @stack('styles')
 </head>
 <body>
 
+    <!-- Ambient glow + dot grid behind the whole app -->
+    <div class="app-backdrop" aria-hidden="true"></div>
+
     <div class="app-layout">
 
         <!-- Sidebar Navigation -->
         @include('components.sidebar')
+        <div class="sidebar-backdrop" data-sidebar-close></div>
 
         <!-- Main Workspace -->
         <div class="main-area">
@@ -56,6 +56,15 @@
 
     <!-- Bootstrap 5 JS Bundle -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // Off-canvas sidebar on small screens.
+        document.querySelectorAll('[data-sidebar-toggle], [data-sidebar-close]').forEach(function (el) {
+            el.addEventListener('click', function () {
+                document.querySelector('.sidebar').classList.toggle('open');
+            });
+        });
+    </script>
 
     @stack('scripts')
 

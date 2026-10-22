@@ -51,5 +51,36 @@ class UserSeeder extends Seeder
                 $user
             );
         }
+
+        // Accounts linked to teacher profiles (see TeacherSeeder).
+        // firstOrCreate keeps existing passwords and roles intact.
+        $teacherUsers = [
+            [
+                'name' => 'Dr. Ahmed Rahman',
+                'email' => 'ahmed.rahman@example.com',
+            ],
+            [
+                'name' => 'Dr. Farhana Islam',
+                'email' => 'farhana.islam@example.com',
+            ],
+            [
+                'name' => 'Mr. Tanvir Hasan',
+                'email' => 'tanvir.hasan@example.com',
+            ],
+        ];
+
+        foreach ($teacherUsers as $teacherUser) {
+            User::firstOrCreate(
+                [
+                    'email' => $teacherUser['email'],
+                ],
+                [
+                    'name' => $teacherUser['name'],
+                    'password' => $password,
+                    'role' => 'TEACHER',
+                    'is_active' => 1,
+                ]
+            );
+        }
     }
 }

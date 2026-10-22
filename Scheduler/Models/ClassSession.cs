@@ -22,4 +22,8 @@ public class ClassSession
 
     // Number of consecutive teaching slots required.
     public int DurationSlots { get; set; }
+
+    // "Single": taught by one teacher of the course pair.
+    // "Joint": both pair teachers are blocked (combined theory, labs).
+    public string TeacherMode { get; set; } = string.Empty;
 }

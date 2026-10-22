@@ -19,6 +19,11 @@ class Batch extends Model
         return $this->hasMany(TeachingHistory::class);
     }
 
+    public function examSchedules(): HasMany
+    {
+        return $this->hasMany(ExamSchedule::class);
+    }
+
     public function scheduleRuns(): HasMany
     {
         return $this->hasMany(ScheduleRun::class);

@@ -1,6 +1,26 @@
 @Scheduler_HostAddress = http://localhost:5098
 
-GET {{Scheduler_HostAddress}}/weatherforecast/
-Accept: application/json
+# Body: the JSON returned by Laravel
+#   GET http://127.0.0.1:8000/scheduler-input?batch_id=1&academic_term_id=1
+
+POST {{Scheduler_HostAddress}}/api/scheduler/validate
+Content-Type: application/json
+
+{}
+
+###
+
+POST {{Scheduler_HostAddress}}/api/scheduler/solve
+Content-Type: application/json
+
+{}
+
+###
+
+# Body: { "input": <scheduler input>, "schedule": <schedule from /solve> }
+POST {{Scheduler_HostAddress}}/api/scheduler/validate-schedule
+Content-Type: application/json
+
+{}
 
 ###

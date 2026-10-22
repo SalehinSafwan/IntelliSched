@@ -75,6 +75,34 @@ public class SchedulerInputValidator
                 errors.Add(
                     $"Offering {offering.Id} has no scheduled classes.");
             }
+
+            // Two pair teachers take one theory class each and
+            // share the third, so a theory course needs exactly 3.
+            if (offering.WeeklyTheoryClasses != 0 &&
+                offering.WeeklyTheoryClasses != 3)
+            {
+                errors.Add(
+                    $"Offering {offering.Id} ({offering.CourseCode}) has " +
+                    $"{offering.WeeklyTheoryClasses} weekly theory classes; " +
+                    "theory courses must have exactly 3.");
+            }
+        }
+
+        // Every course is taught by a pair of teachers. A teacher is
+        // eligible only if they have a suitability score for the course.
+        foreach (var course in input.Offerings
+                     .GroupBy(o => o.CourseId)
+                     .Select(g => g.First()))
+        {
+            int eligibleTeachers = input.Teachers.Count(t =>
+                t.SuitabilityScores.ContainsKey(course.CourseId));
+
+            if (eligibleTeachers < 2)
+            {
+                errors.Add(
+                    $"Course {course.CourseCode} has {eligibleTeachers} " +
+                    "eligible teacher(s); a teacher pair (2) is required.");
+            }
         }
 
         return errors;

@@ -71,16 +71,10 @@ class AuthController extends Controller
     }
 
     /**
-     * Redirect users to their respective dashboard depending on role.
+     * Every role lands on the shared dashboard, which adapts to the role.
      */
     protected function redirectBasedOnRole(?string $role)
     {
-        return match ($role) {
-            'admin' => redirect()->route('admin.dashboard'),
-            'coordinator' => redirect()->route('coordinator.dashboard'),
-            'teacher' => redirect()->route('teacher.dashboard'),
-            'student' => redirect()->route('student.dashboard'),
-            default => redirect()->route('admin.dashboard'),
-        };
+        return redirect()->route('dashboard');
     }
 }

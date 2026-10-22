@@ -5,269 +5,206 @@
 @section('content')
 
 @php
-    $role = request('preview_role', session('current_role', auth()->user()->role ?? 'ADMIN'));
-    $role = strtoupper($role);
+    $isManager = in_array($role, ['admin', 'coordinator'], true);
+    $runByBatch = $publishedRuns->keyBy('batch_id');
 @endphp
 
-<!-- Welcome Banner -->
-<div class="glass-card mb-4" style="background: linear-gradient(135deg, rgba(99, 102, 241, 0.18), rgba(139, 92, 246, 0.12)); border-color: rgba(139, 92, 246, 0.3);">
+<!-- Welcome -->
+<div class="glass-card mb-4" style="background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(168, 85, 247, 0.1)); border-color: rgba(139, 92, 246, 0.32);">
     <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
         <div>
-            <h2 class="brand-font fw-bold mb-1 text-white">Welcome back, {{ auth()->user()->name ?? 'Administrator' }} 👋</h2>
+            <div class="page-eyebrow">{{ config('intellisched.roles')[$role] ?? ucfirst($role) }}</div>
+            <h2 class="brand-font fw-bold mb-1 text-gradient">Welcome back, {{ auth()->user()->name }}</h2>
             <p class="text-muted mb-0" style="font-size: 0.9rem;">
-                Academic Term: <span class="text-indigo fw-semibold">Fall 2026</span> · Computer Science & Engineering Department
+                @if($term)
+                    Current term: <span class="text-indigo fw-semibold">{{ $term->name }}</span>
+                    · {{ \Carbon\Carbon::parse($term->start_date)->format('d M') }} – {{ \Carbon\Carbon::parse($term->end_date)->format('d M Y') }}
+                @else
+                    No academic term is marked as current.
+                @endif
             </p>
         </div>
-        <div class="d-flex align-items-center gap-2">
-            @if(in_array($role, ['ADMIN', 'COORDINATOR']))
-                <a href="{{ route('schedules.create') }}" class="btn-indigo">
-                    <i class="bi bi-play-circle-fill"></i> Generate Routine
-                </a>
+        <div class="d-flex flex-wrap gap-2">
+            @if($isManager)
+                <a href="{{ route('schedules.create') }}" class="btn-indigo"><i class="bi bi-stars"></i> Generate Routine</a>
+                <a href="{{ route('exams.create') }}" class="btn-glass"><i class="bi bi-calendar-plus"></i> Schedule Exams</a>
+            @elseif($role === 'teacher')
+                <a href="{{ route('my.schedule') }}" class="btn-indigo"><i class="bi bi-calendar3"></i> My Schedule</a>
+                <a href="{{ route('my.availability') }}" class="btn-glass"><i class="bi bi-calendar-week"></i> My Availability</a>
             @else
-                <a href="{{ route('schedules.index') }}" class="btn-indigo">
-                    <i class="bi bi-calendar3"></i> View Schedule
-                </a>
+                <a href="{{ route('schedules.index') }}" class="btn-indigo"><i class="bi bi-calendar3"></i> Class Routines</a>
+                <a href="{{ route('exams.index') }}" class="btn-glass"><i class="bi bi-card-checklist"></i> Exam Schedules</a>
             @endif
         </div>
     </div>
 </div>
 
-@if(in_array($role, ['ADMIN', 'COORDINATOR']))
-    <!-- Admin & Coordinator Dashboard Stats -->
+@if($isManager)
     <div class="row g-4 mb-4">
-        <!-- Teachers -->
         <div class="col-12 col-sm-6 col-xl-3">
-            <div class="glass-card card-hoverable stat-card">
-                <div>
-                    <div class="stat-lbl">Active Teachers</div>
-                    <div class="stat-val text-white">24</div>
-                    <div class="text-success" style="font-size: 0.75rem; margin-top: 4px;">
-                        <i class="bi bi-arrow-up-right me-1"></i>100% Availability set
-                    </div>
+            <a href="{{ route('teachers.index') }}" class="text-decoration-none">
+                <div class="glass-card card-hoverable stat-card">
+                    <div><div class="stat-lbl">Active Teachers</div><div class="stat-val text-white">{{ $stats['teachers'] }}</div></div>
+                    <div class="stat-icon-wrapper stat-icon-primary"><i class="bi bi-person-video3"></i></div>
                 </div>
-                <div class="stat-icon-wrapper stat-icon-primary">
-                    <i class="bi bi-person-video3"></i>
-                </div>
-            </div>
+            </a>
         </div>
-
-        <!-- Courses -->
         <div class="col-12 col-sm-6 col-xl-3">
-            <div class="glass-card card-hoverable stat-card">
-                <div>
-                    <div class="stat-lbl">Active Courses</div>
-                    <div class="stat-val text-white">32</div>
-                    <div class="text-muted" style="font-size: 0.75rem; margin-top: 4px;">
-                        20 Theory · 12 Lab
-                    </div>
-                </div>
-                <div class="stat-icon-wrapper stat-icon-accent">
-                    <i class="bi bi-journal-bookmark-fill"></i>
-                </div>
-            </div>
-        </div>
-
-        <!-- Rooms -->
-        <div class="col-12 col-sm-6 col-xl-3">
-            <div class="glass-card card-hoverable stat-card">
-                <div>
-                    <div class="stat-lbl">Classrooms & Labs</div>
-                    <div class="stat-val text-white">18</div>
-                    <div class="text-muted" style="font-size: 0.75rem; margin-top: 4px;">
-                        12 Theory · 6 Specialized Labs
-                    </div>
-                </div>
-                <div class="stat-icon-wrapper stat-icon-success">
-                    <i class="bi bi-building"></i>
-                </div>
-            </div>
-        </div>
-
-        <!-- Batches -->
-        <div class="col-12 col-sm-6 col-xl-3">
-            <div class="glass-card card-hoverable stat-card">
-                <div>
-                    <div class="stat-lbl">Active Batches</div>
-                    <div class="stat-val text-white">8</div>
-                    <div class="text-muted" style="font-size: 0.75rem; margin-top: 4px;">
-                        16 Sections (A & B)
-                    </div>
-                </div>
-                <div class="stat-icon-wrapper stat-icon-warning">
-                    <i class="bi bi-collection-fill"></i>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Scheduling Engine Status & Quick Actions -->
-    <div class="row g-4 mb-4">
-        <div class="col-12 col-lg-8">
-            <div class="glass-card h-100">
-                <div class="d-flex align-items-center justify-content-between mb-4">
+            <a href="{{ route('courses.index') }}" class="text-decoration-none">
+                <div class="glass-card card-hoverable stat-card">
                     <div>
-                        <h4 class="brand-font fw-bold text-white mb-1">Scheduling Engine Status</h4>
-                        <p class="text-muted mb-0" style="font-size: 0.85rem;">OR-Tools CP-SAT Solver Readiness</p>
+                        <div class="stat-lbl">Active Courses</div><div class="stat-val text-white">{{ $stats['courses'] }}</div>
+                        <div class="text-muted mt-1" style="font-size: 0.75rem;">{{ $stats['theory'] }} theory · {{ $stats['lab'] }} lab</div>
                     </div>
-                    <span class="badge-custom badge-active">
-                        <i class="bi bi-check-circle-fill"></i> Solver Ready
-                    </span>
+                    <div class="stat-icon-wrapper stat-icon-accent"><i class="bi bi-journal-bookmark-fill"></i></div>
                 </div>
-
-                <div class="p-4 rounded-4 mb-4" style="background: rgba(15, 20, 35, 0.6); border: 1px solid var(--border-color);">
-                    <div class="row align-items-center g-3">
-                        <div class="col-12 col-md-6">
-                            <div class="text-muted" style="font-size: 0.8rem; font-weight: 600;">CURRENT ROUTINE VERSION</div>
-                            <div class="h5 fw-bold text-white mb-1">Routine Run #5 (Fall 2026)</div>
-                            <div class="text-muted" style="font-size: 0.8rem;">Generated Oct 06, 2026 · 08:32 PM</div>
-                        </div>
-                        <div class="col-12 col-md-3">
-                            <div class="text-muted" style="font-size: 0.8rem; font-weight: 600;">OPTIMIZATION SCORE</div>
-                            <div class="h3 fw-bold text-success mb-0">91.4%</div>
-                            <div class="text-muted" style="font-size: 0.75rem;">High Suitability</div>
-                        </div>
-                        <div class="col-12 col-md-3">
-                            <div class="text-muted" style="font-size: 0.8rem; font-weight: 600;">HARD CONFLICTS</div>
-                            <div class="h3 fw-bold text-white mb-0">
-                                <span class="badge bg-success" style="font-size: 1rem;">0 Conflicts</span>
-                            </div>
-                            <div class="text-muted" style="font-size: 0.75rem;">100% Conflict Free</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="d-flex flex-wrap gap-2">
-                    <a href="{{ route('schedules.create') }}" class="btn-indigo">
-                        <i class="bi bi-play-circle-fill"></i> Run Schedule Wizard
-                    </a>
-                    <a href="{{ route('schedules.index') }}" class="btn-glass">
-                        <i class="bi bi-eye-fill"></i> View Active Timetable
-                    </a>
-                    <a href="{{ route('schedules.conflicts') }}" class="btn-glass">
-                        <i class="bi bi-shield-check"></i> Run Conflict Diagnostics
-                    </a>
-                </div>
-            </div>
+            </a>
         </div>
+        <div class="col-12 col-sm-6 col-xl-3">
+            <a href="{{ route('rooms.index') }}" class="text-decoration-none">
+                <div class="glass-card card-hoverable stat-card">
+                    <div>
+                        <div class="stat-lbl">Rooms & Labs</div><div class="stat-val text-white">{{ $stats['rooms'] }}</div>
+                        <div class="text-muted mt-1" style="font-size: 0.75rem;">{{ number_format($stats['seats']) }} seats</div>
+                    </div>
+                    <div class="stat-icon-wrapper stat-icon-success"><i class="bi bi-building"></i></div>
+                </div>
+            </a>
+        </div>
+        <div class="col-12 col-sm-6 col-xl-3">
+            <a href="{{ route('batches.index') }}" class="text-decoration-none">
+                <div class="glass-card card-hoverable stat-card">
+                    <div>
+                        <div class="stat-lbl">Active Batches</div><div class="stat-val text-white">{{ $stats['batches'] }}</div>
+                        <div class="text-muted mt-1" style="font-size: 0.75rem;">{{ $stats['sections'] }} sections · {{ $stats['students'] }} students</div>
+                    </div>
+                    <div class="stat-icon-wrapper stat-icon-warning"><i class="bi bi-mortarboard-fill"></i></div>
+                </div>
+            </a>
+        </div>
+    </div>
 
-        <!-- Recent System Activity -->
-        <div class="col-12 col-lg-4">
+    <div class="row g-4 mb-4">
+        <!-- Routine status per batch -->
+        <div class="col-12 col-xl-7">
             <div class="glass-card h-100">
-                <div class="d-flex align-items-center justify-content-between mb-3">
-                    <h5 class="brand-font fw-bold text-white mb-0">Recent Activities</h5>
-                    <a href="{{ route('audit.index') }}" class="text-indigo" style="font-size: 0.8rem; text-decoration: none;">View All</a>
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="brand-font fw-bold text-white mb-0">Routine Status{{ $term ? ' · ' . $term->name : '' }}</h5>
+                    <a href="{{ route('schedules.index') }}" class="text-indigo text-decoration-none" style="font-size: 0.82rem;">All routines</a>
                 </div>
-                <div class="d-flex flex-column gap-3">
-                    <div class="d-flex gap-3">
-                        <div class="stat-icon-wrapper stat-icon-primary" style="width: 36px; height: 36px; font-size: 1rem; flex-shrink: 0;">
-                            <i class="bi bi-cpu-fill"></i>
-                        </div>
+                @forelse($batches as $batch)
+                    @php $run = $runByBatch->get($batch->id); @endphp
+                    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 py-2 border-bottom border-secondary">
                         <div>
-                            <div class="fw-semibold text-white" style="font-size: 0.85rem;">Routine Regenerated</div>
-                            <div class="text-muted" style="font-size: 0.76rem;">CSE 47 Section A & B schedule updated</div>
-                            <div class="text-dim" style="font-size: 0.7rem;">15 mins ago by Admin</div>
+                            <span class="fw-bold text-white brand-font">{{ $batch->name }}</span>
+                            <span class="text-dim ms-1" style="font-size: 0.78rem;">Seniority {{ $batch->seniority_order }} · {{ $batch->sections->count() }} sections</span>
                         </div>
+                        @if($run)
+                            <div class="d-flex gap-2 align-items-center">
+                                <span class="badge-custom badge-active badge-dot">Published v{{ $run->version }}</span>
+                                <a href="{{ route('schedules.show', $run->id) }}" class="btn-glass btn-sm-custom"><i class="bi bi-eye"></i> View</a>
+                            </div>
+                        @else
+                            <div class="d-flex gap-2 align-items-center">
+                                <span class="badge-custom badge-archived">No routine</span>
+                                <a href="{{ route('schedules.create') }}" class="btn-glass btn-sm-custom"><i class="bi bi-stars"></i> Generate</a>
+                            </div>
+                        @endif
                     </div>
-
-                    <div class="d-flex gap-3">
-                        <div class="stat-icon-wrapper stat-icon-accent" style="width: 36px; height: 36px; font-size: 1rem; flex-shrink: 0;">
-                            <i class="bi bi-sliders"></i>
-                        </div>
-                        <div>
-                            <div class="fw-semibold text-white" style="font-size: 0.85rem;">Teacher Preferences Saved</div>
-                            <div class="text-muted" style="font-size: 0.76rem;">Dr. Ahmed updated course suitability scores</div>
-                            <div class="text-dim" style="font-size: 0.7rem;">1 hour ago by Dr. Ahmed</div>
-                        </div>
-                    </div>
-
-                    <div class="d-flex gap-3">
-                        <div class="stat-icon-wrapper stat-icon-success" style="width: 36px; height: 36px; font-size: 1rem; flex-shrink: 0;">
-                            <i class="bi bi-journal-plus"></i>
-                        </div>
-                        <div>
-                            <div class="fw-semibold text-white" style="font-size: 0.85rem;">Course CSE3202 Updated</div>
-                            <div class="text-muted" style="font-size: 0.76rem;">Database Lab credit set to 1.5</div>
-                            <div class="text-dim" style="font-size: 0.7rem;">3 hours ago by Coordinator</div>
-                        </div>
-                    </div>
+                @empty
+                    <p class="text-muted mb-0">No active batches. <a href="{{ route('batches.create') }}">Create one</a>.</p>
+                @endforelse
+                <div class="d-flex gap-3 mt-3 text-muted" style="font-size: 0.8rem;">
+                    <span><i class="bi bi-card-checklist me-1"></i>{{ $publishedExams->count() }} published exam schedule(s)</span>
+                    <span><i class="bi bi-pencil-square me-1"></i>{{ $draftExams }} draft(s)</span>
                 </div>
+            </div>
+        </div>
+
+        <!-- Readiness -->
+        <div class="col-12 col-xl-5">
+            <div class="glass-card h-100">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="brand-font fw-bold text-white mb-0">Generator Readiness</h5>
+                    @if(empty($issues))
+                        <span class="badge-custom badge-active badge-dot">Ready</span>
+                    @else
+                        <span class="badge-custom badge-inactive badge-dot">{{ count($issues) }} issue(s)</span>
+                    @endif
+                </div>
+                @if(empty($issues))
+                    <p class="text-muted mb-0"><i class="bi bi-check-circle-fill text-emerald me-1"></i> Every course has a teacher pair, every lab course has a room and every batch has a course list.</p>
+                @else
+                    <ul class="conflict-list">
+                        @foreach(array_slice($issues, 0, 6) as $issue)
+                            <li><a href="{{ $issue['url'] }}" class="text-decoration-none" style="color: inherit;">{{ $issue['text'] }} <i class="bi bi-arrow-right-short"></i></a></li>
+                        @endforeach
+                    </ul>
+                    @if(count($issues) > 6)<p class="text-dim mt-2 mb-0" style="font-size: 0.8rem;">and {{ count($issues) - 6 }} more…</p>@endif
+                @endif
             </div>
         </div>
     </div>
-@endif
 
-@if($role === 'TEACHER')
-    <!-- Teacher Dashboard View -->
+    <!-- Recent activity -->
+    <div class="glass-card mb-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="brand-font fw-bold text-white mb-0">Recent Activity</h5>
+            @if($role === 'admin')
+                <a href="{{ route('audit.index') }}" class="text-indigo text-decoration-none" style="font-size: 0.82rem;">Audit trail</a>
+            @endif
+        </div>
+        @forelse($activity as $log)
+            <div class="d-flex justify-content-between gap-3 py-2 border-bottom border-secondary" style="font-size: 0.86rem;">
+                <span><span class="fw-semibold text-white">{{ $log->user?->name ?? 'System' }}</span>
+                    <span class="text-muted">· {{ strtolower(str_replace('_', ' ', $log->action)) }}</span></span>
+                <span class="text-dim" style="white-space: nowrap;">{{ $log->created_at?->diffForHumans() }}</span>
+            </div>
+        @empty
+            <p class="text-muted mb-0">No activity recorded yet.</p>
+        @endforelse
+    </div>
+@else
     <div class="row g-4 mb-4">
-        <div class="col-12 col-md-4">
-            <div class="glass-card stat-card">
-                <div>
-                    <div class="stat-lbl">My Assigned Courses</div>
-                    <div class="stat-val text-white">3 Courses</div>
-                    <div class="text-muted" style="font-size: 0.75rem; margin-top: 4px;">Database Systems, Lab, AI</div>
-                </div>
-                <div class="stat-icon-wrapper stat-icon-primary">
-                    <i class="bi bi-journal-bookmark-fill"></i>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-12 col-md-4">
-            <div class="glass-card stat-card">
-                <div>
-                    <div class="stat-lbl">Weekly Hours</div>
-                    <div class="stat-val text-white">12 Hrs / Wk</div>
-                    <div class="text-success" style="font-size: 0.75rem; margin-top: 4px;">Within workload limits</div>
-                </div>
-                <div class="stat-icon-wrapper stat-icon-success">
-                    <i class="bi bi-clock-history"></i>
+        @if($role === 'teacher')
+            <div class="col-12 col-md-4">
+                <div class="glass-card stat-card">
+                    <div>
+                        <div class="stat-lbl">My Weekly Periods</div>
+                        <div class="stat-val text-white">{{ $teacherPeriods }}<span class="text-muted fs-6"> / {{ $teacher?->max_weekly_classes ?? '—' }}</span></div>
+                    </div>
+                    <div class="stat-icon-wrapper stat-icon-primary"><i class="bi bi-speedometer2"></i></div>
                 </div>
             </div>
-        </div>
-
-        <div class="col-12 col-md-4">
-            <div class="glass-card stat-card">
-                <div>
-                    <div class="stat-lbl">Availability Status</div>
-                    <div class="stat-val text-emerald" style="color: #6ee7b7;">Configured</div>
-                    <div class="text-muted" style="font-size: 0.75rem; margin-top: 4px;">Sun - Thu active</div>
-                </div>
-                <div class="stat-icon-wrapper stat-icon-warning">
-                    <i class="bi bi-calendar-check"></i>
-                </div>
+        @endif
+        <div class="col-12 {{ $role === 'teacher' ? 'col-md-8' : '' }}">
+            <div class="glass-card h-100">
+                <h5 class="brand-font fw-bold text-white mb-3">Published Routines</h5>
+                @forelse($publishedRuns as $run)
+                    <a href="{{ route('schedules.show', $run->id) }}" class="badge-custom badge-active text-decoration-none me-2 mb-2">{{ $run->batch_name }} · v{{ $run->version }}</a>
+                @empty
+                    <p class="text-muted mb-0">No routines have been published yet.</p>
+                @endforelse
             </div>
         </div>
     </div>
-@endif
 
-@if($role === 'STUDENT')
-    <!-- Student Dashboard View -->
-    <div class="row g-4 mb-4">
-        <div class="col-12 col-md-6">
-            <div class="glass-card">
-                <h5 class="brand-font fw-bold text-white mb-2"><i class="bi bi-mortarboard-fill me-2 text-indigo"></i> My Batch Overview</h5>
-                <div class="p-3 rounded mb-3" style="background: rgba(255,255,255,0.03);">
-                    <div class="fw-semibold text-white">Batch: CSE 47 (Section A)</div>
-                    <div class="text-muted" style="font-size: 0.85rem;">Total Students: 60 · Semester: 6th</div>
-                </div>
-                <a href="{{ route('schedules.index', ['view' => 'section']) }}" class="btn-indigo w-100 justify-content-center">
-                    <i class="bi bi-calendar3"></i> Open Class Routine
-                </a>
+    <div class="glass-card mb-4">
+        <h5 class="brand-font fw-bold text-white mb-3">Upcoming Exams</h5>
+        @php
+            $upcoming = $publishedExams->flatMap(fn ($s) => $s->courses->map(fn ($c) => ['schedule' => $s, 'course' => $c]))
+                ->filter(fn ($row) => $row['course']->exam_date && $row['course']->exam_date->gte(today()))
+                ->sortBy(fn ($row) => $row['course']->exam_date->timestamp)
+                ->take(8);
+        @endphp
+        @forelse($upcoming as $row)
+            <div class="d-flex justify-content-between py-2 border-bottom border-secondary" style="font-size: 0.86rem;">
+                <span><span class="fw-semibold text-white">{{ $row['schedule']->batch?->name }}</span> <span class="text-muted">· {{ $row['course']->course?->course_code }} {{ $row['course']->course?->course_name }}</span></span>
+                <a href="{{ route('exams.show', $row['schedule']) }}" class="text-indigo text-decoration-none">{{ $row['course']->exam_date->format('D d M Y') }}</a>
             </div>
-        </div>
-
-        <div class="col-12 col-md-6">
-            <div class="glass-card">
-                <h5 class="brand-font fw-bold text-white mb-2"><i class="bi bi-card-checklist me-2 text-warning"></i> Next Upcoming CT / Exam</h5>
-                <div class="p-3 rounded mb-3" style="background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.2);">
-                    <div class="fw-bold text-warning">Database Systems (CSE3201) — CT 1</div>
-                    <div class="text-muted" style="font-size: 0.85rem;">Date: Nov 15, 2026 · Time: 10:00 AM · Room 101</div>
-                </div>
-                <a href="{{ route('exams.index') }}" class="btn-glass w-100 justify-content-center">
-                    <i class="bi bi-file-earmark-text"></i> View Full Exam Timetable
-                </a>
-            </div>
-        </div>
+        @empty
+            <p class="text-muted mb-0">No upcoming exams.</p>
+        @endforelse
     </div>
 @endif
 

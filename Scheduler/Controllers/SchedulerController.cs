@@ -1,7 +1,5 @@
 using Scheduler.Models;
 using Microsoft.AspNetCore.Mvc;
-using System.Linq;
-using System.Text.Json;
 using Scheduler.Services;
 
 namespace Scheduler.Controllers;
@@ -10,57 +8,12 @@ namespace Scheduler.Controllers;
 [Route("api/scheduler")]
 public class SchedulerController : ControllerBase
 {
-    
-[HttpPost("generate")]
-public IActionResult Generate([FromBody] SchedulerInput input)
-{
-    return Ok(new
+    private readonly ILogger<SchedulerController> _logger;
+
+    public SchedulerController(ILogger<SchedulerController> logger)
     {
-        success = true,
-        message = "Updated controller is running",
-        offering_count = input.Offerings.Count,
-        offering_ids = input.Offerings.Select(o => o.Id).ToList(),
-        offering_course_codes = input.Offerings
-            .Select(o => o.CourseCode)
-            .ToList()
-    });
-}
-
-
-
-
-[HttpPost("test-offerings")]
-public IActionResult TestOfferings([FromBody] JsonElement json)
-{
-    if (!json.TryGetProperty("offerings", out var offerings))
-    {
-        return BadRequest(new
-        {
-            error = "Top-level offerings property was not found."
-        });
+        _logger = logger;
     }
-
-    var result = JsonSerializer.Deserialize<List<CourseOfferingInput>>(
-        offerings.GetRawText(),
-        new JsonSerializerOptions
-        {
-            PropertyNameCaseInsensitive = true,
-            NumberHandling =
-                System.Text.Json.Serialization.JsonNumberHandling
-                    .AllowReadingFromString
-        });
-
-    return Ok(new
-    {
-        raw_offering_count = offerings.GetArrayLength(),
-        deserialized_count = result?.Count ?? 0,
-        ids = result?.Select(o => o.Id).ToList()
-    });
-}
-
-
-
-// Add this method inside SchedulerController.
 
 [HttpPost("validate")]
 public IActionResult ValidateInput([FromBody] SchedulerInput input)
@@ -150,27 +103,93 @@ public IActionResult BuildCandidates([FromBody] SchedulerInput input)
 [HttpPost("solve")]
 public IActionResult Solve([FromBody] SchedulerInput input)
 {
-    var validator = new SchedulerInputValidator();
-    var errors = validator.Validate(input);
+    try
+    {
+        var validator = new SchedulerInputValidator();
+        var errors = validator.Validate(input);
 
-    if (errors.Count > 0)
+        if (errors.Count > 0)
+        {
+            return BadRequest(new
+            {
+                success = false,
+                status = "InvalidInput",
+                errors
+            });
+        }
+
+        var sessions = new ClassSessionBuilder().Build(input);
+
+        var candidates = new PlacementCandidateBuilder()
+            .Build(input, sessions);
+
+        var result = new SchedulerSolverService()
+            .Solve(input, sessions, candidates);
+
+        // Independently validate the returned schedule before
+        // allowing Laravel to display or publish it.
+        if (result.Success && result.Schedule != null)
+        {
+            result.Validation = new ScheduleResultValidator()
+                .Validate(input, sessions, result.Schedule);
+
+            if (!result.Validation.IsValid)
+            {
+                _logger.LogError(
+                    "Solver produced an invalid schedule: {Errors}",
+                    string.Join("; ", result.Validation.Errors));
+
+                result.Success = false;
+                result.Status = "INVALID_SOLUTION";
+                result.Message =
+                    "The solver returned a schedule that failed validation.";
+            }
+        }
+
+        return Ok(result);
+    }
+    catch (Exception ex)
+    {
+        _logger.LogError(ex, "Timetable generation failed.");
+
+        return StatusCode(500, new
+        {
+            success = false,
+            status = "SolverError",
+            message = "Timetable generation failed unexpectedly."
+        });
+    }
+}
+
+
+
+// Re-checks a previously generated schedule against the current
+// input, e.g. right before Laravel publishes it.
+[HttpPost("validate-schedule")]
+public IActionResult ValidateSchedule([FromBody] ScheduleValidationRequest request)
+{
+    var inputErrors = new SchedulerInputValidator().Validate(request.Input);
+
+    if (inputErrors.Count > 0)
     {
         return BadRequest(new
         {
             success = false,
-            errors
+            status = "InvalidInput",
+            errors = inputErrors
         });
     }
 
-    var sessions = new ClassSessionBuilder().Build(input);
+    var sessions = new ClassSessionBuilder().Build(request.Input);
 
-    var candidates = new PlacementCandidateBuilder()
-        .Build(input, sessions);
+    var validation = new ScheduleResultValidator()
+        .Validate(request.Input, sessions, request.Schedule);
 
-    var result = new SchedulerSolverService()
-        .Solve(input, sessions, candidates);
-
-    return Ok(result);
+    return Ok(new
+    {
+        success = true,
+        validation
+    });
 }
 
 

@@ -2,42 +2,72 @@
 
 namespace Database\Seeders;
 
+use App\Models\User;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
 
 class DatabaseSeeder extends Seeder
 {
+    /**
+     * Seed the application's database with role accounts.
+     */
     public function run(): void
     {
-        $this->call([
+        $password = Hash::make('password');
 
-            // Academic foundation
-            AcademicTermSeeder::class,
-            BatchSeeder::class,
-            SectionSeeder::class,
-            CourseSeeder::class,
+        // Admin User
+        User::updateOrCreate(
+            ['email' => 'admin@intellisched.edu'],
+            [
+                'name' => 'System Administrator',
+                'password' => $password,
+                'role' => 'admin',
+                'is_active' => true,
+            ]
+        );
 
-            // Infrastructure
-            RoomSeeder::class,
-            TimeSlotSeeder::class,
+        // Coordinator User
+        User::updateOrCreate(
+            ['email' => 'coordinator@intellisched.edu'],
+            [
+                'name' => 'Academic Coordinator',
+                'password' => $password,
+                'role' => 'coordinator',
+                'is_active' => true,
+            ]
+        );
 
-            // Users and teachers
-            UserSeeder::class,
-            TeacherSeeder::class,
+        // Coordinator User Alias
+        User::updateOrCreate(
+            ['email' => 'coord@intellisched.edu'],
+            [
+                'name' => 'Academic Coordinator',
+                'password' => $password,
+                'role' => 'coordinator',
+                'is_active' => true,
+            ]
+        );
 
-            // Course-teacher data
-            TeacherExpertiseSeeder::class,
-            TeacherPreferenceSeeder::class,
-            TeacherAvailabilitySeeder::class,
-            TeachingHistorySeeder::class,
+        // Teacher User
+        User::updateOrCreate(
+            ['email' => 'teacher@intellisched.edu'],
+            [
+                'name' => 'Dr. Ahmed Rahman',
+                'password' => $password,
+                'role' => 'teacher',
+                'is_active' => true,
+            ]
+        );
 
-            // Course delivery
-            CourseOfferingSeeder::class,
-
-            // Room restrictions
-            RoomCourseEligibilitySeeder::class,
-
-            // Existing academic conflicts
-            ExamSeeder::class,
-        ]);
+        // Student User
+        User::updateOrCreate(
+            ['email' => 'student@intellisched.edu'],
+            [
+                'name' => 'Sabbir Ahmed (CR)',
+                'password' => $password,
+                'role' => 'student',
+                'is_active' => true,
+            ]
+        );
     }
 }

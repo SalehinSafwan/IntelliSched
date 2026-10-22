@@ -21,8 +21,8 @@
             --bg-dark:       #080c18;
             --card-bg:       rgba(18, 24, 48, 0.55);
             --card-border:   rgba(139, 92, 246, 0.18);
-            --text-primary:  #f1f5f9;
-            --text-muted:    #94a3b8;
+            --text-primary:  #ffffff;
+            --text-muted:    #f8fafc;
             --indigo:        #6366f1;
             --violet:        #8b5cf6;
             --purple:        #a855f7;
@@ -152,15 +152,16 @@
             font-size: 1.9rem;
             font-weight: 800;
             letter-spacing: -0.03em;
-            background: linear-gradient(135deg, #e2e8f0 30%, #a78bfa);
+            background: linear-gradient(135deg, #ffffff 30%, #c4b5fd);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
         }
         .brand-sub {
-            color: var(--text-muted);
+            color: #f8fafc;
             font-size: 0.875rem;
             margin-top: 4px;
+            font-weight: 500;
         }
 
         /* ── Role badges ── */
@@ -178,24 +179,24 @@
             padding: 5px 12px;
             border-radius: 20px;
             font-size: 0.75rem;
-            font-weight: 500;
-            border: 1px solid rgba(255,255,255,0.1);
-            background: rgba(255,255,255,0.04);
-            color: var(--text-muted);
+            font-weight: 600;
+            border: 1px solid rgba(255,255,255,0.2);
+            background: rgba(255,255,255,0.08);
+            color: #ffffff;
             transition: all 0.25s ease;
         }
-        .role-badge.admin     { border-color: rgba(239,68,68,0.3);   color: #fca5a5; }
-        .role-badge.coord     { border-color: rgba(99,102,241,0.4);  color: #a5b4fc; }
-        .role-badge.teacher   { border-color: rgba(34,197,94,0.3);   color: #86efac; }
-        .role-badge.student   { border-color: rgba(251,191,36,0.3);  color: #fde68a; }
+        .role-badge.admin     { border-color: rgba(239,68,68,0.4);   color: #fca5a5; }
+        .role-badge.coord     { border-color: rgba(99,102,241,0.5);  color: #c7d2fe; }
+        .role-badge.teacher   { border-color: rgba(34,197,94,0.4);   color: #86efac; }
+        .role-badge.student   { border-color: rgba(251,191,36,0.4);  color: #fde68a; }
 
         /* ── Section label ── */
         .section-label {
-            font-size: 0.7rem;
-            font-weight: 600;
+            font-size: 0.75rem;
+            font-weight: 700;
             letter-spacing: 0.1em;
             text-transform: uppercase;
-            color: var(--text-muted);
+            color: #ffffff;
             margin-bottom: 18px;
         }
 
@@ -209,7 +210,7 @@
             left: 16px;
             top: 50%;
             transform: translateY(-50%);
-            color: #4b5563;
+            color: #f1f5f9;
             font-size: 1.05rem;
             transition: color 0.3s ease;
             z-index: 5;
@@ -220,7 +221,7 @@
             right: 14px;
             top: 50%;
             transform: translateY(-50%);
-            color: #4b5563;
+            color: #f1f5f9;
             font-size: 1rem;
             z-index: 5;
             cursor: pointer;
@@ -229,13 +230,13 @@
             padding: 0;
             transition: color 0.3s ease;
         }
-        .field-toggle:hover { color: var(--violet); }
+        .field-toggle:hover { color: #a78bfa; }
 
         input.field-input {
             width: 100%;
-            background: rgba(15, 20, 40, 0.6) !important;
-            border: 1px solid rgba(75,85,99,0.35);
-            color: var(--text-primary) !important;
+            background: rgba(15, 20, 40, 0.75) !important;
+            border: 1px solid rgba(255,255,255,0.2);
+            color: #ffffff !important;
             border-radius: 14px;
             padding: 14px 16px 14px 46px;
             font-size: 0.95rem;
@@ -243,7 +244,7 @@
             transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
             outline: none;
         }
-        input.field-input::placeholder { color: #4b5563; }
+        input.field-input::placeholder { color: #cbd5e1; }
         input.field-input:focus {
             border-color: var(--violet);
             background: rgba(15, 20, 40, 0.8) !important;
@@ -264,7 +265,7 @@
             align-items: center;
             gap: 8px;
             font-size: 0.875rem;
-            color: var(--text-muted);
+            color: #f8fafc;
             cursor: pointer;
             user-select: none;
         }
@@ -276,11 +277,11 @@
         }
         .forgot-link {
             font-size: 0.875rem;
-            color: var(--violet);
+            color: #a78bfa;
             text-decoration: none;
             transition: color 0.25s ease;
         }
-        .forgot-link:hover { color: var(--purple); text-decoration: underline; }
+        .forgot-link:hover { color: #c084fc; text-decoration: underline; }
 
         /* ── Submit button ── */
         .btn-sign-in {
@@ -340,11 +341,11 @@
             content: '';
             flex: 1;
             height: 1px;
-            background: rgba(255,255,255,0.07);
+            background: rgba(255,255,255,0.15);
         }
         .divider span {
             font-size: 0.75rem;
-            color: #374151;
+            color: #e2e8f0;
             letter-spacing: 0.05em;
         }
 
@@ -352,16 +353,16 @@
         .card-footer-text {
             text-align: center;
             font-size: 0.875rem;
-            color: var(--text-muted);
+            color: #f8fafc;
             margin-top: 6px;
         }
         .card-footer-text a {
-            color: var(--violet);
+            color: #a78bfa;
             text-decoration: none;
             font-weight: 600;
             transition: color 0.25s ease;
         }
-        .card-footer-text a:hover { color: var(--purple); }
+        .card-footer-text a:hover { color: #c084fc; }
 
         /* ── Alert ── */
         .alert-error {
@@ -400,8 +401,8 @@
             position: fixed;
             bottom: 18px;
             right: 20px;
-            font-size: 0.7rem;
-            color: rgba(255,255,255,0.15);
+            font-size: 0.75rem;
+            color: #cbd5e1;
             font-family: 'Inter', sans-serif;
             z-index: 100;
             letter-spacing: 0.05em;

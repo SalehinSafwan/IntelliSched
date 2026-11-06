@@ -52,4 +52,20 @@ return [
     // Theory courses always have exactly this many weekly classes.
     'weekly_theory_classes' => 3,
 
+    // Student class representatives who receive teacher messages.
+    'class_reps' => [
+        'CR' => 'Class Representative (CR)',
+        'ACR' => 'Assistant Class Representative (ACR)',
+    ],
+
+    // Teacher → CR/ACR message types: [label, icon, colour class].
+    'message_categories' => [
+        'RESCHEDULE' => ['label' => 'Class rescheduled', 'icon' => 'bi-arrow-repeat', 'tone' => 'warning'],
+        'CANCEL' => ['label' => 'Class cancelled', 'icon' => 'bi-x-octagon', 'tone' => 'danger'],
+        'EXTRA_CLASS' => ['label' => 'Extra / make-up class', 'icon' => 'bi-plus-circle', 'tone' => 'success'],
+        'ROOM_CHANGE' => ['label' => 'Room change', 'icon' => 'bi-door-open', 'tone' => 'info'],
+        'ASSESSMENT' => ['label' => 'Quiz / assignment', 'icon' => 'bi-pencil-square', 'tone' => 'info'],
+        'GENERAL' => ['label' => 'General notice', 'icon' => 'bi-megaphone', 'tone' => 'neutral'],
+    ],
+
 ];

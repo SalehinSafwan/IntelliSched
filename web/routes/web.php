@@ -2,9 +2,12 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AcademicTermController;
+use App\Http\Controllers\Analysis\BottleneckController;
+use App\Http\Controllers\Analysis\UtilizationController;
 use App\Http\Controllers\AuditLogController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BatchController;
+use App\Http\Controllers\ClassMessageController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ExamController;
@@ -14,6 +17,8 @@ use App\Http\Controllers\SchedulerInputController;
 use App\Http\Controllers\Scheduling\ScheduleGenerationController;
 use App\Http\Controllers\Scheduling\ScheduleViewController;
 use App\Http\Controllers\SectionController;
+use App\Http\Controllers\Teacher\FreeSlotController;
+use App\Http\Controllers\Teacher\SupervisionController;
 use App\Http\Controllers\TeacherController;
 use App\Http\Controllers\TeacherCourseScoreController;
 use App\Http\Controllers\TimeSlotController;
@@ -46,10 +51,29 @@ Route::middleware('auth')->group(function () {
     Route::get('/export/exam/{exam}.pdf', [PdfExportController::class, 'exam'])->whereNumber('exam')->name('export.exam');
 
     // ── Teacher self-service ─────────────────────────────────────────
-    Route::middleware('role:teacher')->prefix('my')->name('my.')->group(function () {
+    Route::middleware(['role:teacher', 'teacher.profile'])->prefix('my')->name('my.')->group(function () {
         Route::get('/schedule', [TeacherController::class, 'mySchedule'])->name('schedule');
         Route::get('/availability', [TeacherController::class, 'myAvailability'])->name('availability');
         Route::put('/availability', [TeacherController::class, 'updateMyAvailability'])->name('availability.update');
+
+        // Supervised sections and the shared free-slot finder.
+        Route::get('/supervision', [SupervisionController::class, 'index'])->name('supervision');
+        Route::post('/supervision', [SupervisionController::class, 'store'])->name('supervision.store');
+        Route::delete('/supervision/{supervision}', [SupervisionController::class, 'destroy'])->name('supervision.destroy');
+        Route::get('/free-slots', [FreeSlotController::class, 'index'])->name('free-slots');
+    });
+
+    // ── Teacher → CR/ACR messages ────────────────────────────────────
+    Route::middleware(['role:teacher', 'teacher.profile'])->prefix('messages')->name('messages.')->group(function () {
+        Route::get('/create', [ClassMessageController::class, 'create'])->name('create');
+        Route::post('/', [ClassMessageController::class, 'store'])->name('store');
+        Route::delete('/{message}', [ClassMessageController::class, 'destroy'])->whereNumber('message')->name('destroy');
+    });
+
+    Route::middleware(['role:teacher,student', 'teacher.profile'])->prefix('messages')->name('messages.')->group(function () {
+        Route::get('/', [ClassMessageController::class, 'index'])->name('index');
+        Route::get('/{message}', [ClassMessageController::class, 'show'])->whereNumber('message')->name('show');
+        Route::post('/{message}/replies', [ClassMessageController::class, 'reply'])->whereNumber('message')->name('reply');
     });
 
     // ── Administrators and coordinators ──────────────────────────────
@@ -100,6 +124,10 @@ Route::middleware('auth')->group(function () {
         Route::post('/exams/{exam}/publish', [ExamController::class, 'publish'])->name('exams.publish');
         Route::post('/exams/{exam}/unpublish', [ExamController::class, 'unpublish'])->name('exams.unpublish');
         Route::delete('/exams/{exam}', [ExamController::class, 'destroy'])->name('exams.destroy');
+
+        // What-if analysis of resource failures
+        Route::get('/analysis/bottleneck', [BottleneckController::class, 'index'])->name('analysis.bottleneck');
+        Route::get('/analysis/utilization', [UtilizationController::class, 'index'])->name('analysis.utilization');
 
         // PDF descriptions of managed records
         Route::get('/export/rooms.pdf', [PdfExportController::class, 'rooms'])->name('export.rooms');

@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
+use App\Models\Section;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 
@@ -53,12 +54,9 @@ class UserSeeder extends Seeder
         }
 
         // Accounts linked to teacher profiles (see TeacherSeeder).
+        // Dr. Ahmed Rahman uses the demo login teacher@intellisched.edu.
         // firstOrCreate keeps existing passwords and roles intact.
         $teacherUsers = [
-            [
-                'name' => 'Dr. Ahmed Rahman',
-                'email' => 'ahmed.rahman@example.com',
-            ],
             [
                 'name' => 'Dr. Farhana Islam',
                 'email' => 'farhana.islam@example.com',
@@ -81,6 +79,16 @@ class UserSeeder extends Seeder
                     'is_active' => 1,
                 ]
             );
+        }
+
+        // The demo student is CR of the first section, once sections
+        // exist (run after SectionSeeder to link them).
+        $section = Section::orderBy('id')->first();
+
+        if ($section) {
+            User::where('email', 'student@intellisched.edu')
+                ->whereNull('section_id')
+                ->update(['section_id' => $section->id, 'class_rep' => 'CR']);
         }
     }
 }

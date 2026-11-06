@@ -47,4 +47,14 @@ class Teacher extends Model
     {
         return $this->hasMany(ScheduleEntry::class);
     }
+
+    public function supervisions(): HasMany
+    {
+        return $this->hasMany(TeacherSupervision::class);
+    }
+
+    public function classMessages(): HasMany
+    {
+        return $this->hasMany(ClassMessage::class);
+    }
 }

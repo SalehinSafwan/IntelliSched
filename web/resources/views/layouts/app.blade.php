@@ -58,6 +58,13 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
+        // Modals must live directly under <body>. Inside .app-layout
+        // (its own stacking context) they render beneath Bootstrap's
+        // backdrop, which dims the page and swallows every click.
+        document.querySelectorAll('.modal').forEach(function (modal) {
+            document.body.appendChild(modal);
+        });
+
         // Off-canvas sidebar on small screens.
         document.querySelectorAll('[data-sidebar-toggle], [data-sidebar-close]').forEach(function (el) {
             el.addEventListener('click', function () {

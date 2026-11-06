@@ -24,4 +24,22 @@ class Section extends Model
     {
         return $this->hasMany(Exam::class);
     }
+
+    public function students(): HasMany
+    {
+        return $this->hasMany(User::class);
+    }
+
+    public function supervisions(): HasMany
+    {
+        return $this->hasMany(TeacherSupervision::class);
+    }
+
+    /**
+     * "Batch 1 · Section A", for menus and message headers.
+     */
+    public function getLabelAttribute(): string
+    {
+        return ($this->batch?->name ?? 'Batch') . ' · Section ' . $this->name;
+    }
 }

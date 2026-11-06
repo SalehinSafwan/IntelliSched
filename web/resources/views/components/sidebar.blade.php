@@ -1,6 +1,10 @@
 @php
     $role = strtolower((string) auth()->user()?->role);
     $isManager = in_array($role, ['admin', 'coordinator'], true);
+    $isRep = $role === 'student' && auth()->user()?->isClassRep();
+    $unreadMessages = in_array($role, ['teacher', 'student'], true)
+        ? app(\App\Services\Messaging\ClassMessageService::class)->unreadCount(auth()->user())
+        : 0;
 @endphp
 
 <aside class="sidebar">
@@ -76,6 +80,16 @@
                 <span>Examinations</span>
             </a>
 
+            <a href="{{ route('analysis.bottleneck') }}" class="{{ request()->routeIs('analysis.bottleneck') ? 'active' : '' }}">
+                <i class="bi bi-diagram-3-fill"></i>
+                <span>Bottleneck Analysis</span>
+            </a>
+
+            <a href="{{ route('analysis.utilization') }}" class="{{ request()->routeIs('analysis.utilization') ? 'active' : '' }}">
+                <i class="bi bi-grid-3x3-gap-fill"></i>
+                <span>Utilization Heatmaps</span>
+            </a>
+
             @if($role === 'admin')
                 <div class="nav-section-title">Administration</div>
 
@@ -102,6 +116,32 @@
             <a href="{{ route('my.availability') }}" class="{{ request()->routeIs('my.availability') ? 'active' : '' }}">
                 <i class="bi bi-calendar-week"></i>
                 <span>My Availability</span>
+            </a>
+
+            <a href="{{ route('my.supervision') }}" class="{{ request()->routeIs('my.supervision*') ? 'active' : '' }}">
+                <i class="bi bi-people-fill"></i>
+                <span>Supervised Sections</span>
+            </a>
+
+            <a href="{{ route('my.free-slots') }}" class="{{ request()->routeIs('my.free-slots') ? 'active' : '' }}">
+                <i class="bi bi-calendar2-check"></i>
+                <span>Free Slot Finder</span>
+            </a>
+
+            <a href="{{ route('messages.index') }}" class="{{ request()->routeIs('messages.*') ? 'active' : '' }}">
+                <i class="bi bi-chat-left-text-fill"></i>
+                <span>CR/ACR Messages</span>
+                @if($unreadMessages)<span class="badge-count">{{ $unreadMessages }}</span>@endif
+            </a>
+        @endif
+
+        @if($isRep)
+            <div class="nav-section-title">Class Representative</div>
+
+            <a href="{{ route('messages.index') }}" class="{{ request()->routeIs('messages.*') ? 'active' : '' }}">
+                <i class="bi bi-chat-left-text-fill"></i>
+                <span>Teacher Messages</span>
+                @if($unreadMessages)<span class="badge-count">{{ $unreadMessages }}</span>@endif
             </a>
         @endif
 

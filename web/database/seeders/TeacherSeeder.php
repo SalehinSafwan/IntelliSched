@@ -12,7 +12,8 @@ class TeacherSeeder extends Seeder
     {
         $teachers = [
             [
-                'email' => 'ahmed.rahman@example.com',
+                // The demo teacher login (see UserSeeder).
+                'email' => 'teacher@intellisched.edu',
                 'employee_code' => 'T001',
                 'department' => 'CSE',
                 'max_weekly_classes' => 12,

@@ -32,7 +32,11 @@
                         </div>
                     </td>
                     <td class="text-muted">{{ $user->email }}</td>
-                    <td><span class="badge-custom badge-role">{{ config('intellisched.roles')[strtolower($user->role)] ?? $user->role }}</span></td>
+                    <td>
+                        <span class="badge-custom badge-role">{{ config('intellisched.roles')[strtolower($user->role)] ?? $user->role }}</span>
+                        @if($user->class_rep)<span class="badge-custom badge-gold">{{ $user->class_rep }}</span>@endif
+                        @if($user->section)<div class="text-muted mt-1" style="font-size: 0.75rem;">{{ $user->section->label }}</div>@endif
+                    </td>
                     <td><x-status-badge :status="$user->is_active ? 'ACTIVE' : 'INACTIVE'" /></td>
                     <td class="text-muted">{{ $user->created_at?->format('d M Y') }}</td>
                     <td class="text-end">

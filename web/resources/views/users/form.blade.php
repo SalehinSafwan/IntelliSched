@@ -48,6 +48,31 @@
                     <div class="form-hint">You cannot change your own role.</div>
                 @endif
             </div>
+            <div class="col-12 col-md-6" data-student-only>
+                <label class="form-label-custom" for="section_id">Section</label>
+                <select id="section_id" name="section_id" class="form-select form-select-custom @error('section_id') is-invalid @enderror">
+                    <option value="">Not assigned</option>
+                    @foreach($sections as $batchName => $batchSections)
+                        <optgroup label="{{ $batchName }}">
+                            @foreach($batchSections as $section)
+                                <option value="{{ $section->id }}" @selected((int) old('section_id', $user->section_id) === (int) $section->id)>{{ $batchName }} · Section {{ $section->name }}</option>
+                            @endforeach
+                        </optgroup>
+                    @endforeach
+                </select>
+                @error('section_id')<div class="invalid-feedback-custom">{{ $message }}</div>@enderror
+            </div>
+            <div class="col-12 col-md-6" data-student-only>
+                <label class="form-label-custom" for="class_rep">Class representative</label>
+                <select id="class_rep" name="class_rep" class="form-select form-select-custom @error('class_rep') is-invalid @enderror">
+                    <option value="">No</option>
+                    @foreach(config('intellisched.class_reps') as $value => $label)
+                        <option value="{{ $value }}" @selected(old('class_rep', $user->class_rep) === $value)>{{ $label }}</option>
+                    @endforeach
+                </select>
+                @error('class_rep')<div class="invalid-feedback-custom">{{ $message }}</div>@enderror
+                <div class="form-hint">The CR and ACR receive their section's teacher messages.</div>
+            </div>
             <div class="col-12">
                 <div class="form-check form-switch">
                     <input type="hidden" name="is_active" value="0">
@@ -65,5 +90,24 @@
         </div>
     </form>
 </div>
+
+@push('scripts')
+<script>
+    // Section and CR/ACR apply to student accounts only.
+    (function () {
+        const role = document.getElementById('role');
+
+        function refresh() {
+            const isStudent = role.value === 'student';
+            document.querySelectorAll('[data-student-only]').forEach(function (el) {
+                el.hidden = !isStudent;
+            });
+        }
+
+        role.addEventListener('change', refresh);
+        refresh();
+    })();
+</script>
+@endpush
 
 @endsection

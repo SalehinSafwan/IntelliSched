@@ -7,6 +7,7 @@ use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
@@ -25,6 +26,8 @@ class User extends Authenticatable
         'email',
         'password',
         'role',
+        'section_id',
+        'class_rep',
         'is_active',
     ];
 
@@ -54,6 +57,24 @@ class User extends Authenticatable
     public function teacher(): HasOne
     {
         return $this->hasOne(Teacher::class);
+    }
+
+    // Students only: the section they study in.
+    public function section(): BelongsTo
+    {
+        return $this->belongsTo(Section::class);
+    }
+
+    /**
+     * An active student who is CR or ACR of a section receives that
+     * section's teacher messages.
+     */
+    public function isClassRep(): bool
+    {
+        return strtolower((string) $this->role) === 'student'
+            && (int) $this->is_active === 1
+            && $this->section_id
+            && in_array($this->class_rep, array_keys(config('intellisched.class_reps')), true);
     }
 
     public function generatedScheduleRuns(): HasMany

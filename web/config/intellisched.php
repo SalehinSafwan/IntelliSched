@@ -68,4 +68,14 @@ return [
         'GENERAL' => ['label' => 'General notice', 'icon' => 'bi-megaphone', 'tone' => 'neutral'],
     ],
 
+    // Schedule assistant (rule-based chatbot for teachers and students).
+    'chatbot' => [
+        // Local clock used for "today", "tomorrow", "next class" and
+        // "class now". The application itself stores times in UTC.
+        'timezone' => env('INTELLISCHED_TIMEZONE', 'Asia/Dhaka'),
+
+        // Longest question accepted, in characters.
+        'max_length' => 200,
+    ],
+
 ];

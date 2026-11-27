@@ -75,5 +75,10 @@
 
     @stack('scripts')
 
+    {{-- Schedule assistant chat panel for the teacher and student portals --}}
+    @if(in_array(strtolower((string) auth()->user()?->role), ['teacher', 'student'], true))
+        @include('components.chatbot')
+    @endif
+
 </body>
 </html>

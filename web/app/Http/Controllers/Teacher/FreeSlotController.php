@@ -9,9 +9,6 @@ use App\Services\Teacher\TeacherSectionService;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
-/**
- * Find periods when the teacher and their students are all free.
- */
 class FreeSlotController extends Controller
 {
     public function index(Request $request, TeacherSectionService $sectionService, FreeSlotFinder $finder): View
@@ -23,7 +20,6 @@ class FreeSlotController extends Controller
         $sections = $sectionService->reachableSections($teacher);
         $allowed = $sections->pluck('id')->map(fn ($id) => (int) $id)->all();
 
-        // Only sections the teacher supervises or teaches can be chosen.
         $selected = collect((array) $request->query('sections', []))
             ->map(fn ($id) => (int) $id)
             ->filter(fn ($id) => in_array($id, $allowed, true))

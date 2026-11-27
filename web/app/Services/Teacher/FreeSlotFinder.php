@@ -9,15 +9,6 @@ use Illuminate\Support\Facades\DB;
 
 class FreeSlotFinder
 {
-    /**
-     * Overlay the teacher's week on the weekly routine of the chosen
-     * sections and find the periods where everyone is free.
-     *
-     * A period is busy for the teacher when they teach a published
-     * class or marked it unavailable; it is busy for a section when the
-     * section has a published class. "Avoid" periods stay free but are
-     * flagged, and every free period shows how many rooms are empty.
-     */
     public function build(Teacher $teacher, array $sectionIds): array
     {
         $slots = TimeSlot::all();
@@ -128,10 +119,6 @@ class FreeSlotFinder
         ];
     }
 
-    /**
-     * Common free periods per day and the longest run of back-to-back
-     * free periods (long enough for a make-up lab when it reaches 3).
-     */
     private function summarise(array $days, array $cells): array
     {
         $perDay = [];
@@ -147,7 +134,6 @@ class FreeSlotFinder
                 $cell = $byDay[$day];
 
                 if ($cell['type'] !== 'slot') {
-                    // Breaks and missing periods interrupt a run.
                     $run = 0;
                     continue;
                 }

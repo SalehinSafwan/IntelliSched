@@ -69,5 +69,23 @@ class DatabaseSeeder extends Seeder
                 'is_active' => true,
             ]
         );
+
+        $this->call([
+            UserSeeder::class,
+            AcademicTermSeeder::class,
+            BatchSeeder::class,
+            SectionSeeder::class,
+            TeacherSeeder::class,
+            CourseSeeder::class,
+            RoomSeeder::class,
+            TimeSlotSeeder::class,
+            CourseOfferingSeeder::class,
+            TeacherAvailabilitySeeder::class,
+            TeacherExpertiseSeeder::class,
+            TeacherPreferenceSeeder::class,
+            RoomCourseEligibilitySeeder::class,
+            TeachingHistorySeeder::class,
+            ExamSeeder::class,
+        ]);
     }
 }

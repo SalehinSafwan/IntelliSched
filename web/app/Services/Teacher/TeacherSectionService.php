@@ -9,10 +9,6 @@ use Illuminate\Support\Facades\DB;
 
 class TeacherSectionService
 {
-    /**
-     * IDs of sections the teacher teaches in a published routine
-     * (as the main or the pair teacher).
-     */
     public function teachingSectionIds(Teacher $teacher): array
     {
         return DB::table('schedule_entries as se')
@@ -36,11 +32,7 @@ class TeacherSectionService
             ->all();
     }
 
-    /**
-     * Every section the teacher may plan with and message: the ones
-     * they supervise plus the ones they teach. Each section carries
-     * `supervises` and `teaches` flags.
-     */
+
     public function reachableSections(Teacher $teacher): Collection
     {
         $supervised = $this->supervisedSectionIds($teacher);

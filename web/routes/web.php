@@ -7,6 +7,7 @@ use App\Http\Controllers\Analysis\UtilizationController;
 use App\Http\Controllers\AuditLogController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BatchController;
+use App\Http\Controllers\ChatbotController;
 use App\Http\Controllers\ClassMessageController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\DashboardController;
@@ -74,6 +75,12 @@ Route::middleware('auth')->group(function () {
         Route::get('/', [ClassMessageController::class, 'index'])->name('index');
         Route::get('/{message}', [ClassMessageController::class, 'show'])->whereNumber('message')->name('show');
         Route::post('/{message}/replies', [ClassMessageController::class, 'reply'])->whereNumber('message')->name('reply');
+    });
+
+    // ── Schedule assistant (rule-based chatbot) ──────────────────────
+    Route::middleware('role:teacher,student')->prefix('assistant')->name('assistant.')->group(function () {
+        Route::get('/questions', [ChatbotController::class, 'questions'])->name('questions');
+        Route::post('/ask', [ChatbotController::class, 'ask'])->middleware('throttle:30,1')->name('ask');
     });
 
     // ── Administrators and coordinators ──────────────────────────────

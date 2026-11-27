@@ -75,6 +75,7 @@ class DatabaseSeeder extends Seeder
             AcademicTermSeeder::class,
             BatchSeeder::class,
             SectionSeeder::class,
+            ClassRepSeeder::class,
             TeacherSeeder::class,
             CourseSeeder::class,
             RoomSeeder::class,

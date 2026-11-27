@@ -29,15 +29,11 @@
 
     <div class="app-layout">
 
-        <!-- Sidebar Navigation -->
-        @include('components.sidebar')
-        <div class="sidebar-backdrop" data-sidebar-close></div>
+        <!-- Top menu bar -->
+        @include('components.navbar')
 
         <!-- Main Workspace -->
         <div class="main-area">
-
-            <!-- Navbar -->
-            @include('components.navbar')
 
             <!-- Main Content Container -->
             <main class="content">
@@ -65,11 +61,49 @@
             document.body.appendChild(modal);
         });
 
-        // Off-canvas sidebar on small screens.
-        document.querySelectorAll('[data-sidebar-toggle], [data-sidebar-close]').forEach(function (el) {
-            el.addEventListener('click', function () {
-                document.querySelector('.sidebar').classList.toggle('open');
-            });
+        // Copy / WhatsApp share for ready-made notices and routines.
+        // data-copy-target / data-whatsapp-target point at a textarea
+        // (possibly edited by the user) holding the text.
+        function sourceText(selector) {
+            var el = document.querySelector(selector);
+            return el ? (el.value !== undefined ? el.value : el.textContent) : '';
+        }
+        function flash(btn, text) {
+            var label = btn.querySelector('span');
+            if (!label) return;
+            var old = label.dataset.label || label.textContent;
+            label.dataset.label = old;
+            label.textContent = text;
+            setTimeout(function () { label.textContent = old; }, 1800);
+        }
+        document.addEventListener('click', function (e) {
+            var copy = e.target.closest('[data-copy-target]');
+            if (copy) {
+                var text = sourceText(copy.dataset.copyTarget);
+                var fallback = function () {
+                    var tmp = document.createElement('textarea');
+                    tmp.value = text;
+                    tmp.style.position = 'fixed';
+                    tmp.style.opacity = '0';
+                    document.body.appendChild(tmp);
+                    tmp.select();
+                    document.execCommand('copy');
+                    tmp.remove();
+                    flash(copy, 'Copied!');
+                };
+                // The clipboard API needs a secure origin (https / localhost).
+                if (navigator.clipboard && window.isSecureContext) {
+                    navigator.clipboard.writeText(text).then(function () { flash(copy, 'Copied!'); }, fallback);
+                } else {
+                    fallback();
+                }
+                return;
+            }
+            var share = e.target.closest('[data-whatsapp-target]');
+            if (share) {
+                e.preventDefault();
+                window.open('https://wa.me/?text=' + encodeURIComponent(sourceText(share.dataset.whatsappTarget)), '_blank', 'noopener');
+            }
         });
     </script>
 

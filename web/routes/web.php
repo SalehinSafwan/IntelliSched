@@ -18,6 +18,7 @@ use App\Http\Controllers\SchedulerInputController;
 use App\Http\Controllers\Scheduling\ScheduleGenerationController;
 use App\Http\Controllers\Scheduling\ScheduleViewController;
 use App\Http\Controllers\SectionController;
+use App\Http\Controllers\Student\ClassPortalController;
 use App\Http\Controllers\Teacher\FreeSlotController;
 use App\Http\Controllers\Teacher\SupervisionController;
 use App\Http\Controllers\TeacherController;
@@ -69,6 +70,20 @@ Route::middleware('auth')->group(function () {
         Route::get('/create', [ClassMessageController::class, 'create'])->name('create');
         Route::post('/', [ClassMessageController::class, 'store'])->name('store');
         Route::delete('/{message}', [ClassMessageController::class, 'destroy'])->whereNumber('message')->name('destroy');
+        // Approve / reject / reject with correction the CR's notice.
+        Route::post('/{message}/review', [ClassMessageController::class, 'review'])->whereNumber('message')->name('review');
+    });
+
+    // CR/ACR answers a teacher's message with a formal class notice.
+    Route::middleware('role:student')->prefix('messages')->name('messages.')->group(function () {
+        Route::post('/{message}/notice', [ClassMessageController::class, 'notice'])->whereNumber('message')->name('notice');
+    });
+
+    // ── Student portal: daily routine; CR/ACR notice board ───────────
+    Route::middleware('role:student')->prefix('class')->name('class.')->group(function () {
+        Route::get('/routine', [ClassPortalController::class, 'routine'])->name('routine');
+        Route::get('/notices', [ClassPortalController::class, 'notices'])->name('notices');
+        Route::post('/notices/{message}/posted', [ClassPortalController::class, 'posted'])->whereNumber('message')->name('notices.posted');
     });
 
     Route::middleware(['role:teacher,student', 'teacher.profile'])->prefix('messages')->name('messages.')->group(function () {

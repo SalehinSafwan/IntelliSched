@@ -8,23 +8,32 @@
 
 @if($teacher)
     <x-page-header eyebrow="Teacher Portal" title="CR / ACR Messages"
-                   subtitle="Tell a section's class representatives about rescheduled or cancelled classes and other notices. Only the CR and ACR of the section you choose receive the message.">
+                   subtitle="Send a section's CR and ACR a message. They reply with a formal notice for the class, which you approve or send back for correction. Approving completes the session.">
         <a href="{{ route('messages.create') }}" class="btn-indigo"><i class="bi bi-send"></i> New Message</a>
     </x-page-header>
 
     @if($sections->isNotEmpty())
-        <div class="filter-pills mb-4">
-            <a href="{{ route('messages.index') }}" class="{{ !$sectionFilter ? 'active' : '' }}">All sections</a>
+        <div class="filter-pills mb-3">
+            <a href="{{ route('messages.index', array_filter(['status' => $statusFilter])) }}" class="{{ !$sectionFilter ? 'active' : '' }}">All sections</a>
             @foreach($sections as $section)
-                <a href="{{ route('messages.index', ['section' => $section->id]) }}" class="{{ $sectionFilter === (int) $section->id ? 'active' : '' }}">{{ $section->label }}</a>
+                <a href="{{ route('messages.index', array_filter(['section' => $section->id, 'status' => $statusFilter])) }}" class="{{ $sectionFilter === (int) $section->id ? 'active' : '' }}">{{ $section->label }}</a>
             @endforeach
         </div>
     @endif
 @else
     <x-page-header eyebrow="Class Representative" title="Messages from Teachers"
                    :subtitle="$isRep
-                       ? 'Notices from your teachers for ' . $student->section?->label . '. Please pass them on to your classmates.'
+                       ? 'Messages from your teachers for ' . $student->section?->label . '. Reply to each with a formal notice; once the teacher approves it, post it for your classmates.'
                        : 'Only a section\'s CR and ACR receive teacher messages.'" />
+@endif
+
+@if($teacher || $isRep)
+    <div class="filter-pills mb-4">
+        @foreach([null => 'All sessions', 'open' => 'Not completed', 'completed' => 'Completed'] as $value => $label)
+            <a href="{{ route('messages.index', array_filter(['section' => $sectionFilter ?: null, 'status' => $value ?: null])) }}"
+               class="{{ $statusFilter === ($value ?: null) ? 'active' : '' }}">{{ $label }}</a>
+        @endforeach
+    </div>
 @endif
 
 @if(!$teacher && !$isRep)
@@ -38,7 +47,11 @@
         <div class="empty-state-icon"><i class="bi bi-chat-square-text"></i></div>
         <h4 class="brand-font fw-bold text-white mt-4">No messages yet</h4>
         <p class="text-muted mb-0">
-            {{ $teacher ? 'Messages you send to a section\'s CR and ACR appear here with their replies.' : 'When a teacher sends your section a notice, it appears here.' }}
+            @if($statusFilter)
+                No {{ $statusFilter === 'completed' ? 'completed' : 'open' }} sessions.
+            @else
+                {{ $teacher ? 'Messages you send to a section\'s CR and ACR appear here with their notices.' : 'When a teacher sends your section a message, it appears here for you to write the class notice.' }}
+            @endif
         </p>
     </div>
 @else
@@ -47,8 +60,10 @@
             @php
                 $category = $categories[$message->category] ?? $categories['GENERAL'];
                 $isUnread = in_array((int) $message->id, $unread, true);
+                $status = $message->statusInfo();
+                $needsAction = $service->needsActionFrom(auth()->user(), $message);
             @endphp
-            <a href="{{ route('messages.show', $message) }}" class="message-row {{ $isUnread ? 'is-unread' : '' }}">
+            <a href="{{ route('messages.show', $message) }}" class="message-row {{ $isUnread ? 'is-unread' : '' }} {{ $needsAction ? 'needs-action' : '' }}">
                 <span class="message-icon tone-{{ $category['tone'] }}"><i class="bi {{ $category['icon'] }}"></i></span>
                 <div class="flex-grow-1 min-w-0">
                     <div class="d-flex flex-wrap justify-content-between gap-2">
@@ -56,7 +71,11 @@
                         <span class="message-meta">{{ $message->last_activity_at?->diffForHumans() }}</span>
                     </div>
                     <div class="message-meta mt-1">
-                        <span class="badge-custom tone-{{ $category['tone'] }}">{{ $category['label'] }}</span>
+                        <span class="badge-custom tone-{{ $status['tone'] }}"><i class="bi {{ $status['icon'] }}"></i> {{ $status['label'] }}</span>
+                        @if($needsAction)
+                            <span class="badge-custom badge-gold"><i class="bi bi-lightning-charge-fill"></i> {{ $teacher ? 'Review needed' : 'Notice needed' }}</span>
+                        @endif
+                        · {{ $category['label'] }}
                         @if($teacher)
                             · To CR/ACR of <span class="text-white">{{ $message->section?->label }}</span>
                         @else

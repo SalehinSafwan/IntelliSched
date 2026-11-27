@@ -92,6 +92,52 @@ class ChatbotTest extends TestCase
         $entry($draft, $aDraft, $tRahman, null, $r301, $slot['SUNDAY'][5]);
     }
 
+    /**
+     * A second batch with brand-new courses and teachers, published
+     * after the first one: the assistant must pick it up with no
+     * code or config change, and keep the first batch working.
+     */
+    public function test_newly_published_batch_with_new_courses_is_answered(): void
+    {
+        $now = now();
+        $ins = fn (string $table, array $row) => DB::table($table)->insertGetId($row + ['created_at' => $now, 'updated_at' => $now]);
+        $slot = fn ($day, $n) => DB::table('time_slots')->where('day', $day)->where('slot_number', $n)->value('id');
+
+        $term = DB::table('academic_terms')->value('id');
+        $batch = $ins('batches', ['name' => 'Batch 24', 'department' => 'CSE', 'program' => 'BSc', 'admission_year' => 2024, 'seniority_order' => 4]);
+        $section = $ins('sections', ['batch_id' => $batch, 'name' => 'A', 'student_count' => 45]);
+        $room = DB::table('rooms')->where('room_code', 'R301')->value('id');
+
+        $os = $ins('courses', ['course_code' => 'CSE 1105', 'course_name' => 'Operating Systems', 'department' => 'CSE', 'course_type' => 'THEORY', 'credit_hours' => 3]);
+        $offering = $ins('course_offerings', ['course_id' => $os, 'section_id' => $section, 'academic_term_id' => $term, 'weekly_theory_classes' => 3, 'weekly_lab_classes' => 0]);
+
+        $teacherUser = User::create(['name' => 'Dr. Sharmin Akter', 'email' => 't010@test.local', 'password' => 'secret', 'role' => 'teacher']);
+        $teacher = $ins('teachers', ['user_id' => $teacherUser->id, 'employee_code' => 'T010', 'department' => 'CSE', 'max_weekly_classes' => 12]);
+        $freshman = User::create(['name' => 'Freshman', 'email' => 'fresh@test.local', 'password' => 'secret', 'role' => 'student', 'section_id' => $section]);
+
+        $run = $ins('schedule_runs', ['batch_id' => $batch, 'academic_term_id' => $term, 'generated_by' => $this->admin->id, 'version' => 1, 'status' => 'PUBLISHED']);
+        $ins('schedule_entries', [
+            'schedule_run_id' => $run, 'course_offering_id' => $offering, 'teacher_id' => $teacher, 'co_teacher_id' => null,
+            'room_id' => $room, 'time_slot_id' => $slot('SUNDAY', 5), 'session_type' => 'THEORY', 'session_group_id' => null,
+        ]);
+
+        // New batch's student: the new course, by code and by name.
+        $when = $this->ask($freshman, 'When is CSE 1105 class?')->json();
+        $this->assertTrue($when['ok'], $when['answer']);
+        $this->assertCount(1, $when['items']);
+        $this->assertStringContainsString('Sharmin Akter', $this->ask($freshman, 'Who teaches Operating Systems?')->json('answer'));
+        $this->assertCount(1, $this->ask($freshman, 'My classes on Sunday')->json('items'));
+
+        // New teacher sees their new class.
+        $mine = $this->ask($teacherUser, 'My classes on Sunday')->json();
+        $this->assertTrue($mine['ok'], $mine['answer']);
+        $this->assertStringContainsString('CSE 1105', $mine['items'][0]['title']);
+
+        // The first batch is unaffected and still can't see the new course.
+        $this->assertCount(2, $this->ask($this->student, 'CSE 3201 class when')->json('items'));
+        $this->assertFalse($this->ask($this->student, 'When is CSE 1105 class?')->json('ok'));
+    }
+
     private function ask(User $user, string $question)
     {
         return $this->actingAs($user)->postJson(route('assistant.ask'), ['question' => $question])->assertOk();

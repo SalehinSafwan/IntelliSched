@@ -68,6 +68,25 @@ return [
         'GENERAL' => ['label' => 'General notice', 'icon' => 'bi-megaphone', 'tone' => 'neutral'],
     ],
 
+    // One-tap phrases for the CR's notice editor.
+    'notice_snippets' => [
+        'Everyone please take note.',
+        'Attendance is mandatory.',
+        'Please be on time.',
+        'Bring your calculator.',
+        'Bring your lab report.',
+        'Please share with everyone who is not in this group.',
+        'Contact me if you have any questions.',
+    ],
+
+    // Stages of a message session. Only COMPLETED is closed.
+    'message_statuses' => [
+        'AWAITING_NOTICE' => ['label' => 'Awaiting notice', 'icon' => 'bi-hourglass-split', 'tone' => 'info'],
+        'PENDING_REVIEW' => ['label' => 'Notice pending review', 'icon' => 'bi-eye', 'tone' => 'warning'],
+        'CHANGES_REQUESTED' => ['label' => 'Correction requested', 'icon' => 'bi-arrow-counterclockwise', 'tone' => 'danger'],
+        'COMPLETED' => ['label' => 'Completed', 'icon' => 'bi-check2-circle', 'tone' => 'success'],
+    ],
+
     // Schedule assistant (rule-based chatbot for teachers and students).
     'chatbot' => [
         // Local clock used for "today", "tomorrow", "next class" and

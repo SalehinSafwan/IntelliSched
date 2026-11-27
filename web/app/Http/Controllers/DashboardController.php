@@ -47,6 +47,15 @@ class DashboardController extends Controller
                 : 0;
         }
 
+        if ($role === 'student') {
+            $portal = app(\App\Services\Student\ClassPortalService::class);
+            $student = $request->user()->loadMissing('section.batch');
+            $data['studentPlan'] = $student->section_id
+                ? $portal->dayPlan($student, null, \App\Services\Chatbot\ChatbotService::now())
+                : null;
+            $data['boardCount'] = $portal->pendingCount($student);
+        }
+
         return view('dashboard.index', $data);
     }
 

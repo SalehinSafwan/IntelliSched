@@ -32,8 +32,12 @@
                 <a href="{{ route('my.schedule') }}" class="btn-indigo"><i class="bi bi-calendar3"></i> My Schedule</a>
                 <a href="{{ route('my.availability') }}" class="btn-glass"><i class="bi bi-calendar-week"></i> My Availability</a>
             @else
-                <a href="{{ route('schedules.index') }}" class="btn-indigo"><i class="bi bi-calendar3"></i> Class Routines</a>
-                <a href="{{ route('exams.index') }}" class="btn-glass"><i class="bi bi-card-checklist"></i> Exam Schedules</a>
+                <a href="{{ route('class.routine') }}" class="btn-indigo"><i class="bi bi-calendar-day"></i> My Routine</a>
+                @if(auth()->user()->isClassRep())
+                    <a href="{{ route('class.notices') }}" class="btn-glass"><i class="bi bi-megaphone"></i> Notice Board @if($boardCount)<span class="nav-badge">{{ $boardCount }}</span>@endif</a>
+                @else
+                    <a href="{{ route('exams.index') }}" class="btn-glass"><i class="bi bi-card-checklist"></i> Exam Schedules</a>
+                @endif
             @endif
         </div>
     </div>
@@ -165,6 +169,38 @@
         @endforelse
     </div>
 @else
+    @if($role === 'student' && $studentPlan)
+        @php
+            $sp = $studentPlan;
+            $spWhen = $sp['is_today'] ? 'Today' : ($sp['date']->isTomorrow() ? 'Tomorrow' : ucfirst(strtolower($sp['day'])));
+            $spTime = fn ($t) => \Carbon\Carbon::createFromFormat('H:i', substr(strlen($t) === 4 ? '0' . $t : $t, 0, 5))->format('g:i A');
+        @endphp
+        <div class="glass-card mb-4">
+            <div class="d-flex flex-wrap justify-content-between align-items-baseline gap-2 mb-3">
+                <h5 class="brand-font fw-bold text-white mb-0">{{ $spWhen }}'s classes <span class="message-meta">· {{ $sp['date']->format('D, d M') }}</span></h5>
+                <a href="{{ route('class.routine') }}" class="text-indigo text-decoration-none" style="font-size: 0.85rem;">Full day &amp; share <i class="bi bi-arrow-right"></i></a>
+            </div>
+            @foreach($sp['changes'] as $change)
+                <div class="routine-change tone-{{ $change['tone'] }}"><i class="bi bi-exclamation-triangle-fill"></i><span>{{ \App\Services\Messaging\ClassMessageService::formatNotice($change['text']) }}</span></div>
+            @endforeach
+            <div class="row g-2">
+                @forelse($sp['sessions'] as $s)
+                    <div class="col-12 col-md-6 col-xl-3">
+                        <div class="routine-slot is-{{ $s['state'] }} mb-0 h-100">
+                            <div class="slot-body">
+                                <div class="t-start text-white fw-bold" style="font-size: 0.85rem;">{{ $spTime($s['start']) }} – {{ $spTime($s['end']) }}</div>
+                                <div class="slot-code">{{ $s['course_code'] }} @if($s['session_type'] === 'LAB')<span class="message-meta">(Lab)</span>@endif</div>
+                                <div class="message-meta"><i class="bi bi-geo-alt"></i> {{ $s['room'] }}</div>
+                            </div>
+                        </div>
+                    </div>
+                @empty
+                    <div class="col-12"><p class="text-muted mb-0">No classes {{ strtolower($spWhen) === 'today' ? 'today' : 'on ' . $spWhen }}.</p></div>
+                @endforelse
+            </div>
+        </div>
+    @endif
+
     <div class="row g-4 mb-4">
         @if($role === 'teacher')
             <div class="col-12 col-md-4">
